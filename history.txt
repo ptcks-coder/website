@@ -19,5 +19,5 @@
 
 [2026-09-29 d] Deploy: SQL init sekali + build OK:
 - `npm run build` sukses.
-- Dump contoh DB → `docker/mysql/init/01-cks.sql`, di-mount ke `/docker-entrypoint-initdb.d` (MySQL hanya import saat volume `db_data` kosong).
+- Dump contoh DB → `docker/mysql/init/01-cks.sql`, di-mount ke `/docker-entrypoint-initdb.d` (MySQL hanya import saat volume `db_data` kosong). Dump diulang dengan utf8mb4 agar tanda baca (—) tidak jadi ???.
 - `docker-entrypoint.sh` web: hanya `prisma migrate deploy` + start; seed.js tidak lagi jalan tiap boot.

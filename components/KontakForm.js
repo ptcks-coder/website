@@ -2,15 +2,17 @@
 
 import { useMemo, useState } from "react";
 
-const INITIAL = { nama: "", telepon: "", pesan: "" };
-const STORAGE_KEY = "cks_kontak_pesan";
+const INITIAL = { nama: "", telepon: "", email: "", pesan: "" };
 
 function validate(form) {
   const errors = {};
   if (!form.nama.trim()) errors.nama = "Nama wajib diisi.";
   if (!form.telepon.trim()) errors.telepon = "Telepon wajib diisi.";
-  else if (!/^0\d{9,13}$/.test(form.telepon.trim())) {
-    errors.telepon = "Telepon harus diawali 0 dan 10–14 digit.";
+  else if (!/^0\d{9,13}$/.test(form.telepon.trim()) && !/^\+62\d{9,13}$/.test(form.telepon.trim())) {
+    errors.telepon = "Telepon harus diawali 0 atau +62.";
+  }
+  if (form.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
+    errors.email = "Format email tidak valid.";
   }
   if (!form.pesan.trim()) errors.pesan = "Pesan wajib diisi.";
   else if (form.pesan.trim().length < 10) {
@@ -23,6 +25,8 @@ export default function KontakForm() {
   const [form, setForm] = useState(INITIAL);
   const [errors, setErrors] = useState({});
   const [done, setDone] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const canSubmit = useMemo(() => Object.keys(validate(form)).length === 0, [form]);
 
@@ -34,29 +38,40 @@ export default function KontakForm() {
       delete next[name];
       return next;
     });
-    setDone(false);
+    setSubmitError("");
   }
 
-  function onSubmit(event) {
+  async function onSubmit(event) {
     event.preventDefault();
     const nextErrors = validate(form);
     setErrors(nextErrors);
+    setSubmitError("");
     if (Object.keys(nextErrors).length) return;
 
-    const payload = {
-      ...form,
-      createdAt: new Date().toISOString()
-    };
-
+    setSubmitting(true);
     try {
-      const existing = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-      const list = Array.isArray(existing) ? existing : [];
-      list.push(payload);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+      const res = await fetch("/api/pesan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nama: form.nama.trim(),
+          telepon: form.telepon.trim(),
+          email: form.email.trim(),
+          pesan: form.pesan.trim()
+        })
+      });
+      const payload = await res.json().catch(() => null);
+      if (!res.ok || !payload?.success) {
+        if (payload?.errors) setErrors(payload.errors);
+        setSubmitError(payload?.error || "Pesan gagal dikirim. Coba lagi.");
+        return;
+      }
       setForm(INITIAL);
       setDone(true);
     } catch {
-      setErrors({ form: "Gagal menyimpan di perangkat ini." });
+      setSubmitError("Tidak dapat menghubungi server. Periksa koneksi lalu coba lagi.");
+    } finally {
+      setSubmitting(false);
     }
   }
 
@@ -64,33 +79,37 @@ export default function KontakForm() {
     <form className="form-panel" onSubmit={onSubmit} noValidate>
       <div className="form-panel-head">
         <h2>Kirim pesan</h2>
-        <p>Pesan tersimpan sementara di browser Anda (localStorage), belum masuk ke server CKS.</p>
+        <p>Pesan diteruskan ke tim CKS — kami akan menghubungi Anda melalui telepon/WA.</p>
       </div>
 
       {done ? (
         <p className="form-success" role="status">
-          Pesan tersimpan di perangkat ini. Kontak kantor belum dilengkapi — petugas belum menerima
-          otomatis dari situs.
+          Pesan berhasil terkirim. Terima kasih — petugas akan segera menindaklanjuti.
         </p>
       ) : null}
-      {errors.form ? <p className="error">{errors.form}</p> : null}
+      {submitError ? <p className="error">{submitError}</p> : null}
 
       <div className="form-grid">
         <label className="field">
-          <span>Nama</span>
+          <span>
+            Nama <span className="req">*</span>
+          </span>
           <input
             name="nama"
             type="text"
             autoComplete="name"
             value={form.nama}
             onChange={onChange}
+            disabled={submitting}
             aria-invalid={Boolean(errors.nama)}
           />
           {errors.nama ? <span className="error">{errors.nama}</span> : null}
         </label>
 
         <label className="field">
-          <span>Telepon</span>
+          <span>
+            Telepon / WhatsApp <span className="req">*</span>
+          </span>
           <input
             name="telepon"
             type="tel"
@@ -99,18 +118,36 @@ export default function KontakForm() {
             placeholder="08…"
             value={form.telepon}
             onChange={onChange}
+            disabled={submitting}
             aria-invalid={Boolean(errors.telepon)}
           />
           {errors.telepon ? <span className="error">{errors.telepon}</span> : null}
         </label>
 
         <label className="field full">
-          <span>Pesan</span>
+          <span>Email (opsional)</span>
+          <input
+            name="email"
+            type="email"
+            autoComplete="email"
+            value={form.email}
+            onChange={onChange}
+            disabled={submitting}
+            aria-invalid={Boolean(errors.email)}
+          />
+          {errors.email ? <span className="error">{errors.email}</span> : null}
+        </label>
+
+        <label className="field full">
+          <span>
+            Pesan <span className="req">*</span>
+          </span>
           <textarea
             name="pesan"
             rows={5}
             value={form.pesan}
             onChange={onChange}
+            disabled={submitting}
             aria-invalid={Boolean(errors.pesan)}
           />
           {errors.pesan ? <span className="error">{errors.pesan}</span> : null}
@@ -118,8 +155,8 @@ export default function KontakForm() {
       </div>
 
       <div className="form-actions">
-        <button type="submit" className="btn btn-primary" disabled={!canSubmit}>
-          Simpan pesan
+        <button type="submit" className="btn btn-primary" disabled={!canSubmit || submitting}>
+          {submitting ? "Mengirim…" : "Kirim pesan"}
         </button>
       </div>
     </form>

@@ -1,0 +1,173 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator nextAdmin {
+  provider = "next-admin-generator-prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  AUTHOR
+}
+
+enum PostStatus {
+  DRAFT
+  PENDING
+  PUBLISHED
+}
+
+enum RegistrationStatus {
+  BARU
+  DIPROSES
+  DITERIMA
+  DITOLAK
+}
+
+enum GalleryMediaType {
+  IMAGE
+  VIDEO
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(AUTHOR)
+  posts     Post[]
+  createdAt DateTime @default(now())
+}
+
+model Post {
+  id             Int        @id @default(autoincrement())
+  title          String
+  slug           String     @unique
+  excerpt        String?    @db.Text
+  contentJson    Json?
+  contentHtml    String?    @db.LongText
+  featuredImage  String?
+  status         PostStatus @default(DRAFT)
+  seoTitle       String?
+  seoDescription String?    @db.Text
+  focusKeyword   String?
+  publishedAt    DateTime?
+  author         User       @relation(fields: [authorId], references: [id])
+  authorId       Int
+  categories     Category[]
+  tags           Tag[]
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+}
+
+model Category {
+  id    Int    @id @default(autoincrement())
+  name  String
+  slug  String @unique
+  posts Post[]
+}
+
+model Tag {
+  id    Int    @id @default(autoincrement())
+  name  String
+  slug  String @unique
+  posts Post[]
+}
+
+model Event {
+  id                Int       @id @default(autoincrement())
+  title             String
+  slug              String    @unique
+  shortDescription  String?   @db.Text
+  longDescriptionJson Json?
+  longDescriptionHtml String? @db.LongText
+  location          String?
+  startAt           DateTime
+  endAt             DateTime?
+  image             String?
+  published         Boolean   @default(true)
+  createdAt         DateTime  @default(now())
+}
+
+model GalleryItem {
+  id        Int              @id @default(autoincrement())
+  title     String
+  caption   String?          @db.Text
+  image     String
+  mediaType GalleryMediaType @default(IMAGE)
+  category  String?          @default("Kegiatan")
+  sortOrder Int              @default(0)
+  published Boolean          @default(true)
+  createdAt DateTime         @default(now())
+}
+
+model Job {
+  id       Int     @id @default(autoincrement())
+  negara   String
+  kode     String
+  posisi   String
+  info     String? @db.Text
+  image    String?
+  active   Boolean @default(true)
+  sortOrder Int    @default(0)
+}
+
+model Branch {
+  id      Int     @id @default(autoincrement())
+  kode    String  @unique
+  nama    String
+  alamat  String? @db.Text
+  telepon String?
+  active  Boolean @default(true)
+}
+
+model Registration {
+  id           Int                @id @default(autoincrement())
+  nomor        String             @unique
+  nama         String
+  nik          String
+  telepon      String
+  email        String
+  jenisKelamin String
+  pendidikan   String
+  negaraTujuan String
+  kabKota      String
+  catatan      String?            @db.Text
+  status       RegistrationStatus @default(BARU)
+  notes        String?            @db.Text
+  createdAt    DateTime           @default(now())
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  nama      String
+  email     String?
+  telepon   String
+  pesan     String   @db.Text
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Setting {
+  id      Int     @id @default(autoincrement())
+  key     String  @unique
+  value   String? @db.Text
+  section String? @default("general")
+}
+
+model PageView {
+  id        BigInt   @id @default(autoincrement())
+  path      String
+  referrer  String?  @db.Text
+  userAgent String?  @db.Text
+  visitor   String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([path])
+}

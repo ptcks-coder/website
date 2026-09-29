@@ -1,0 +1,50 @@
+services:
+  db:
+    image: mysql:8.4
+    container_name: cks-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: cks_web
+      MYSQL_USER: cks
+      MYSQL_PASSWORD: cks_secret
+      MYSQL_ROOT_PASSWORD: cks_root_secret
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      # Hanya dijalankan MySQL saat data dir volume KOSONG (init pertama).
+      # Restart/rebuild tidak mengulang import / tidak drop data.
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-ucks", "-pcks_secret"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  web:
+    build: .
+    container_name: cks-web
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: "mysql://cks:cks_secret@db:3306/cks_web"
+      SESSION_SECRET: ${SESSION_SECRET:-cks-prod-session-secret-ganti-di-env}
+      # Kredensial di bawah hanya fallback env; data contoh user sudah di SQL init.
+      # Web tidak lagi menjalankan seed.js pada setiap start.
+      ADMIN_NAME: ${ADMIN_NAME:-Administrator}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@cks.id}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
+      AUTHOR_NAME: ${AUTHOR_NAME:-Redaksi}
+      AUTHOR_EMAIL: ${AUTHOR_EMAIL:-redaksi@cks.id}
+      AUTHOR_PASSWORD: ${AUTHOR_PASSWORD:-redaksi123}
+      UPLOAD_DIR: /app/uploads
+    ports:
+      - "3000:3000"
+    volumes:
+      - uploads_data:/app/uploads
+
+volumes:
+  db_data:
+  uploads_data:

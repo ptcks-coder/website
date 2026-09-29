@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `GalleryItem` ADD COLUMN `mediaType` ENUM('IMAGE', 'VIDEO') NOT NULL DEFAULT 'IMAGE';

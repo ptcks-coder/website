@@ -25,9 +25,7 @@ const NEGARA_TUJUAN_OPTIONS = [
 
 const NEGARA_TUJUAN_VALUES = new Set(NEGARA_TUJUAN_OPTIONS.map((o) => o.value));
 
-const API_BASE =
-  (typeof process !== "undefined" && process.env.NEXT_PUBLIC_PJTKI_API_URL) ||
-  "http://127.0.0.1:3004";
+const API_URL = "/api/pendaftaran";
 
 function isValidTelepon(raw) {
   const t = String(raw || "").trim();
@@ -98,7 +96,7 @@ export default function DaftarForm() {
 
     setSubmitting(true);
     try {
-      const res = await fetch(`${API_BASE}/api/pendaftaran-online`, {
+      const res = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

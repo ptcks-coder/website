@@ -16,3 +16,7 @@
 npm-debug.log*
 .env*.local
 .DS_Store
+.env
+uploads/
+*.jar
+ck.jar

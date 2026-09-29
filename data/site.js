@@ -26,6 +26,7 @@ export const NAV_LINKS = [
   { href: "/layanan", label: "Layanan" },
   { href: "/lowongan", label: "Lowongan" },
   { href: "/galeri", label: "Galeri" },
+  { href: "/event", label: "Event" },
   { href: "/cabang", label: "Cabang" },
   { href: "/blog", label: "Blog" },
   { href: "/kontak", label: "Kontak" }

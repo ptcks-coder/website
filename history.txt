@@ -21,3 +21,13 @@
 - `npm run build` sukses.
 - Dump contoh DB → `docker/mysql/init/01-cks.sql`, di-mount ke `/docker-entrypoint-initdb.d` (MySQL hanya import saat volume `db_data` kosong). Dump diulang dengan utf8mb4 agar tanda baca (—) tidak jadi ???.
 - `docker-entrypoint.sh` web: hanya `prisma migrate deploy` + start; seed.js tidak lagi jalan tiap boot.
+
+[2026-09-29 e] Pesan Masuk admin = baca detail (bukan edit):
+- Klik baris di /admin/message membuka halaman baca seperti email (nama, email, telepon, tanggal, isi penuh, badge dibaca, kembali/hapus).
+- Halaman kustom `app/admin/(panel)/message/[id]` menimpa form NextAdmin; isRead=true otomatis saat dibuka.
+- API DELETE `/api/admin/messages/[id]`; permissions Message hanya `delete` (daftar NextAdmin tetap).
+
+[2026-09-29 e] Logo header putih:
+- Latar hitam berasal dari CSS `.brand-logo` (`background: #0b1220`), bukan dari PNG (logo transparan).
+- Diganti `background: #ffffff` di `app/globals.css` saja.
+- Verifikasi: computed `rgb(255,255,255)`; screenshot header desktop OK (teks CKS tetap terbaca).

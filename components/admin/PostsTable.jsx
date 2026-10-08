@@ -18,6 +18,17 @@ const STATUS_CLASS = {
   PUBLISHED: "bg-emerald-100 text-emerald-700"
 };
 
+const DocIcon = (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M8 3h6l5 5v11a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"
+    />
+    <path strokeLinecap="round" d="M14 3v5h5M9 13h6M9 17h4" />
+  </svg>
+);
+
 function fmtDate(iso) {
   if (!iso) return "—";
   return new Date(iso).toLocaleDateString("id-ID", {
@@ -88,7 +99,7 @@ export default function PostsTable({ role }) {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-1 text-sm">
+        <div className="ck-tabs">
           {TABS.map((t) => {
             const count = t.key ? counts[t.key] || 0 : total;
             const active = status === t.key;
@@ -96,23 +107,22 @@ export default function PostsTable({ role }) {
               <Link
                 key={t.key}
                 href={t.key ? `/admin/posts?status=${t.key}` : "/admin/posts"}
-                className={`rounded-md px-3 py-1.5 font-medium ${
-                  active ? "bg-blue-600 text-white" : "text-gray-600 hover:bg-gray-100"
-                }`}
+                className={`ck-tab${active ? " is-active" : ""}`}
               >
-                {t.label} <span className="opacity-70">({count})</span>
+                {t.label}
+                <span className="ck-tab-count">{count}</span>
               </Link>
             );
           })}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex w-full items-center gap-2 sm:w-auto">
           <input
-            className="ck-input w-56"
+            className="ck-input !w-full sm:!w-56"
             placeholder="Cari judul…"
             value={q}
             onChange={(e) => setQ(e.target.value)}
           />
-          <Link href="/admin/posts/new" className="ck-btn-primary">
+          <Link href="/admin/posts/new" className="ck-btn-primary shrink-0">
             + Artikel baru
           </Link>
         </div>
@@ -121,21 +131,21 @@ export default function PostsTable({ role }) {
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
 
       <div className="ck-card overflow-x-auto p-0">
-        <table className="min-w-full divide-y divide-gray-200 text-sm">
-          <thead className="bg-gray-50">
+        <table className="ck-table">
+          <thead>
             <tr>
-              <th className="px-4 py-3 text-left font-semibold text-gray-600">Judul</th>
-              <th className="px-4 py-3 text-left font-semibold text-gray-600">Penulis</th>
-              <th className="px-4 py-3 text-left font-semibold text-gray-600">Kategori</th>
-              <th className="px-4 py-3 text-left font-semibold text-gray-600">Status</th>
-              <th className="px-4 py-3 text-left font-semibold text-gray-600">Tanggal</th>
-              <th className="px-4 py-3 text-right font-semibold text-gray-600">Aksi</th>
+              <th>Judul</th>
+              <th>Penulis</th>
+              <th>Kategori</th>
+              <th>Status</th>
+              <th>Tanggal</th>
+              <th className="!text-right">Aksi</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
             {(data?.posts || []).map((p) => (
-              <tr key={p.id} className="hover:bg-gray-50">
-                <td className="px-4 py-3">
+              <tr key={p.id}>
+                <td>
                   <Link
                     href={`/admin/posts/${p.id}`}
                     className="font-medium text-gray-900 hover:text-blue-700"
@@ -144,15 +154,15 @@ export default function PostsTable({ role }) {
                   </Link>
                   <span className="block text-xs text-gray-400">/blog/{p.slug}</span>
                 </td>
-                <td className="px-4 py-3 text-gray-600">{p.author?.name}</td>
-                <td className="px-4 py-3 text-gray-600">
+                <td className="text-gray-600">{p.author?.name}</td>
+                <td className="text-gray-600">
                   {p.categories.map((c) => c.name).join(", ") || "—"}
                 </td>
-                <td className="px-4 py-3">
+                <td>
                   <span className={`ck-badge ${STATUS_CLASS[p.status]}`}>{STATUS_LABEL[p.status]}</span>
                 </td>
-                <td className="px-4 py-3 text-gray-500">{fmtDate(p.publishedAt || p.updatedAt)}</td>
-                <td className="px-4 py-3">
+                <td className="text-gray-500">{fmtDate(p.publishedAt || p.updatedAt)}</td>
+                <td>
                   <div className="flex items-center justify-end gap-1.5 text-xs">
                     <Link href={`/admin/posts/${p.id}`} className="ck-btn-secondary px-2 py-1">
                       Edit
@@ -190,17 +200,21 @@ export default function PostsTable({ role }) {
             ))}
             {data && data.posts.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-10 text-center text-gray-400">
-                  Tidak ada artikel.{" "}
-                  <Link href="/admin/posts/new" className="text-blue-600 hover:underline">
-                    Tulis artikel pertama →
-                  </Link>
+                <td colSpan={6}>
+                  <div className="ck-empty">
+                    <span className="ck-empty-icon">{DocIcon}</span>
+                    <p className="ck-empty-title">Belum ada artikel</p>
+                    <p className="ck-empty-desc">Mulai tulis artikel pertama Anda.</p>
+                    <Link href="/admin/posts/new" className="ck-btn-primary mt-2">
+                      + Tulis artikel
+                    </Link>
+                  </div>
                 </td>
               </tr>
             ) : null}
             {!data && !error ? (
               <tr>
-                <td colSpan={6} className="px-4 py-10 text-center text-gray-400">
+                <td colSpan={6} className="py-14 text-center text-sm text-gray-400">
                   Memuat…
                 </td>
               </tr>

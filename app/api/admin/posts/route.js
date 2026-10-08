@@ -75,7 +75,12 @@ export async function POST(request) {
   const status = statusFromAction(body.action, user.role);
   const slug = await uniqueSlug(body.slug || title);
   const contentJson = body.contentJson && typeof body.contentJson === "object" ? body.contentJson : null;
-  const contentHtml = contentJson ? docToHtml(contentJson) : "";
+  const contentHtml =
+    typeof body.contentHtml === "string" && body.contentHtml.trim()
+      ? body.contentHtml
+      : contentJson
+        ? docToHtml(contentJson)
+        : "";
 
   const post = await prisma.post.create({
     data: {
@@ -91,8 +96,8 @@ export async function POST(request) {
       focusKeyword: body.focusKeyword || null,
       publishedAt: status === "PUBLISHED" ? new Date() : null,
       authorId: user.id,
-      categories: { set: (body.categoryIds || []).map((id) => ({ id: Number(id) })) },
-      tags: { set: (body.tagIds || []).map((id) => ({ id: Number(id) })) }
+      categories: { connect: (body.categoryIds || []).map((id) => ({ id: Number(id) })) },
+      tags: { connect: (body.tagIds || []).map((id) => ({ id: Number(id) })) }
     }
   });
 

@@ -47,7 +47,12 @@ export async function PUT(request, { params }) {
     body.longDescriptionJson && typeof body.longDescriptionJson === "object"
       ? body.longDescriptionJson
       : existing.longDescriptionJson;
-  const longDescriptionHtml = longDescriptionJson ? docToHtml(longDescriptionJson) : existing.longDescriptionHtml;
+  const longDescriptionHtml =
+    typeof body.longDescriptionHtml === "string" && body.longDescriptionHtml.trim()
+      ? body.longDescriptionHtml
+      : longDescriptionJson
+        ? docToHtml(longDescriptionJson)
+        : existing.longDescriptionHtml;
 
   const startAt = body.startAt ? new Date(body.startAt) : existing.startAt;
   const endAt = body.endAt ? new Date(body.endAt) : existing.endAt;

@@ -56,7 +56,12 @@ export async function POST(request) {
   const startAt = body.startAt ? new Date(body.startAt) : new Date();
   const endAt = body.endAt ? new Date(body.endAt) : null;
   const longDescriptionJson = body.longDescriptionJson && typeof body.longDescriptionJson === "object" ? body.longDescriptionJson : null;
-  const longDescriptionHtml = longDescriptionJson ? docToHtml(longDescriptionJson) : "";
+  const longDescriptionHtml =
+    typeof body.longDescriptionHtml === "string" && body.longDescriptionHtml.trim()
+      ? body.longDescriptionHtml
+      : longDescriptionJson
+        ? docToHtml(longDescriptionJson)
+        : "";
 
   const event = await prisma.event.create({
     data: {

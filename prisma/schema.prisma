@@ -171,3 +171,15 @@ model PageView {
   @@index([createdAt])
   @@index([path])
 }
+
+model HeroSlide {
+  id        Int      @id @default(autoincrement())
+  title     String
+  subtitle  String?  @db.Text
+  image     String
+  ctaLabel  String?  @default("Daftar CPMI")
+  ctaHref   String?  @default("/daftar")
+  sortOrder Int      @default(0)
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+}

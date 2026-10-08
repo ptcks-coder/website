@@ -39,11 +39,11 @@ function StatCard({ label, value, icon: Icon, accent, subtext, href }) {
   const inner = (
     <div className="flex items-start justify-between gap-3">
       <div className="min-w-0">
-        <p className="text-xs font-medium uppercase tracking-wide text-gray-400">{label}</p>
+        <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">{label}</p>
         <p className="mt-2 text-2xl font-bold tabular-nums text-gray-900">{fmtNum(value)}</p>
         {subtext ? <p className="mt-1 text-xs text-gray-500">{subtext}</p> : null}
       </div>
-      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${accent}`}>
+      <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl shadow-sm ${accent}`}>
         <Icon className="h-5 w-5 text-white" />
       </div>
     </div>
@@ -53,13 +53,13 @@ function StatCard({ label, value, icon: Icon, accent, subtext, href }) {
     return (
       <Link
         href={href}
-        className="block rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition hover:border-blue-200 hover:shadow-md"
+        className="block rounded-2xl border border-gray-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md"
       >
         {inner}
       </Link>
     );
   }
-  return <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">{inner}</div>;
+  return <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">{inner}</div>;
 }
 
 function VisitsChart({ data }) {
@@ -78,7 +78,7 @@ function VisitsChart({ data }) {
   const ticks = [0, 0.5, 1].map((f) => Math.round(max * f));
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+    <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h3 className="text-base font-semibold text-gray-900">Kunjungan 30 hari</h3>
@@ -154,7 +154,7 @@ function QuickLinks({ isAdmin, stats }) {
     );
   }
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+    <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
       <h3 className="mb-1 text-base font-semibold text-gray-900">Aksi cepat</h3>
       <p className="mb-4 text-xs text-gray-500">Navigasi ke halaman yang sering dipakai</p>
       <ul className="space-y-2">
@@ -176,7 +176,7 @@ function QuickLinks({ isAdmin, stats }) {
 
 function RecentPosts({ items }) {
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+    <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
       <div className="mb-4 flex items-center justify-between">
         <div>
           <h3 className="text-base font-semibold text-gray-900">Artikel terbaru</h3>
@@ -299,14 +299,16 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-3">
+      <div className="ck-page-head">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Halo, {data.name}</h1>
-          <p className="mt-0.5 text-sm text-gray-500">Ringkasan aktivitas website CKS.</p>
+          <h1 className="ck-page-title">Halo, {data.name}</h1>
+          <p className="ck-page-desc">Ringkasan aktivitas website CKS.</p>
         </div>
-        <Link href="/admin/posts/new" className="ck-btn-primary">
-          + Tulis Artikel
-        </Link>
+        <div className="ck-page-actions">
+          <Link href="/admin/posts/new" className="ck-btn-primary">
+            + Tulis Artikel
+          </Link>
+        </div>
       </div>
 
       <div

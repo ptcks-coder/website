@@ -3,6 +3,7 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
+import EditorShell from "@/components/admin/EditorShell";
 
 const NovelEditor = dynamic(() => import("@/components/admin/NovelEditor"), {
   ssr: false,
@@ -14,6 +15,11 @@ const NovelEditor = dynamic(() => import("@/components/admin/NovelEditor"), {
 });
 
 const STATUS_LABEL = { DRAFT: "Draft", PENDING: "Menunggu persetujuan", PUBLISHED: "Terbit" };
+const STATUS_CLASS = {
+  DRAFT: "bg-gray-100 text-gray-600",
+  PENDING: "bg-amber-100 text-amber-700",
+  PUBLISHED: "bg-emerald-100 text-emerald-700"
+};
 
 function slugifyLocal(text) {
   return String(text || "")
@@ -46,6 +52,20 @@ function Field({ label, children, hint }) {
   );
 }
 
+function SideSection({ title, children, defaultOpen = true }) {
+  return (
+    <details className="ck-side-section" open={defaultOpen}>
+      <summary className="ck-side-section-head">
+        <span>{title}</span>
+        <svg viewBox="0 0 24 24" className="ck-side-chevron" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="m6 9 6 6 6-6" />
+        </svg>
+      </summary>
+      <div className="ck-side-section-body">{children}</div>
+    </details>
+  );
+}
+
 export default function PostEditor({ post, categories, tags, role }) {
   const router = useRouter();
   const isAdmin = role === "ADMIN";
@@ -62,17 +82,20 @@ export default function PostEditor({ post, categories, tags, role }) {
   const [categoryIds, setCategoryIds] = useState(new Set(post?.categories?.map((c) => c.id) || []));
   const [tagIds, setTagIds] = useState(new Set(post?.tags?.map((t) => t.id) || []));
   const [seoOpen, setSeoOpen] = useState(Boolean(post?.seoTitle || post?.seoDescription));
+  const [panelOpen, setPanelOpen] = useState(true);
   const [saving, setSaving] = useState("");
   const [message, setMessage] = useState(null);
   const [uploading, setUploading] = useState(false);
   const contentRef = useRef(post?.contentJson || null);
+  const htmlRef = useRef(post?.contentHtml || "");
   const fileRef = useRef(null);
 
   const status = post?.status || "DRAFT";
   const effectiveSlug = slugTouched ? slug : slugifyLocal(title);
 
-  const onEditorUpdate = useCallback((json) => {
+  const onEditorUpdate = useCallback((json, html) => {
     contentRef.current = json;
+    if (typeof html === "string") htmlRef.current = html;
   }, []);
 
   function toggleSet(set, setter, id) {
@@ -91,6 +114,7 @@ export default function PostEditor({ post, categories, tags, role }) {
         slug: effectiveSlug,
         excerpt,
         contentJson: contentRef.current,
+        contentHtml: htmlRef.current,
         featuredImage: featuredImage || null,
         seoTitle: seoTitle || null,
         seoDescription: seoDescription || null,
@@ -139,274 +163,265 @@ export default function PostEditor({ post, categories, tags, role }) {
 
   const canPublish = isAdmin;
 
-  return (
-    <div className="space-y-4">
+  const actions = (
+    <>
       {message ? (
-        <div
-          className={`rounded-md px-3 py-2 text-sm ${
-            message.type === "ok"
-              ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200"
-              : "bg-red-50 text-red-700 ring-1 ring-red-200"
+        <span
+          className={`hidden text-xs sm:inline ${
+            message.type === "ok" ? "text-emerald-600" : "text-red-600"
           }`}
         >
           {message.text}
-        </div>
+        </span>
       ) : null}
+      <button
+        type="button"
+        className="ck-btn-secondary"
+        disabled={Boolean(saving)}
+        onClick={() => save("draft")}
+      >
+        {saving === "draft" ? "Menyimpan…" : "Simpan draft"}
+      </button>
+      {canPublish ? (
+        <button
+          type="button"
+          className="ck-btn-primary"
+          disabled={Boolean(saving)}
+          onClick={() => save("publish")}
+        >
+          {saving === "publish"
+            ? "Menyimpan…"
+            : status === "PUBLISHED"
+              ? "Perbarui"
+              : status === "PENDING"
+                ? "Setujui & terbitkan"
+                : "Terbitkan"}
+        </button>
+      ) : (
+        <button
+          type="button"
+          className="ck-btn-primary"
+          disabled={Boolean(saving)}
+          onClick={() => save("submit")}
+        >
+          {saving === "submit" ? "Mengirim…" : "Kirim untuk ditinjau"}
+        </button>
+      )}
+    </>
+  );
 
-      <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
-        {/* Kolom utama */}
-        <div className="space-y-4">
-          <div className="ck-card space-y-4">
-            <Field label="Judul">
+  const side = (
+    <>
+      <SideSection title="Status &amp; visibilitas">
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-sm text-gray-500">Status</span>
+          <span className={`ck-badge ${STATUS_CLASS[status]}`}>{STATUS_LABEL[status]}</span>
+        </div>
+        {post?.publishedAt ? (
+          <p className="text-xs text-gray-400">
+            Terbit {new Date(post.publishedAt).toLocaleString("id-ID")}
+          </p>
+        ) : null}
+        {status === "PUBLISHED" && canPublish ? (
+          <button
+            type="button"
+            className="ck-btn-secondary w-full"
+            disabled={Boolean(saving)}
+            onClick={() => save("unpublish")}
+          >
+            Tarik ke draft
+          </button>
+        ) : null}
+      </SideSection>
+
+      <SideSection title="Permalink">
+        <input
+          className="ck-input font-mono text-xs"
+          value={effectiveSlug}
+          onChange={(e) => {
+            setSlugTouched(true);
+            setSlug(e.target.value);
+          }}
+          aria-label="Slug URL"
+        />
+        <p className="mt-1 break-all text-xs text-gray-400">/blog/{effectiveSlug || "…"}</p>
+      </SideSection>
+
+      <SideSection title="Gambar utama">
+        {featuredImage ? (
+          <div className="space-y-2">
+            <img
+              src={featuredImage}
+              alt="Gambar utama"
+              className="aspect-video w-full rounded-md object-cover"
+            />
+            <button
+              type="button"
+              className="ck-btn-danger w-full"
+              onClick={() => setFeaturedImage("")}
+            >
+              Hapus gambar
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            className="ck-btn-secondary w-full"
+            disabled={uploading}
+            onClick={() => fileRef.current?.click()}
+          >
+            {uploading ? "Mengunggah…" : "Unggah gambar"}
+          </button>
+        )}
+        <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={pickFeatured} />
+        <input
+          className="ck-input mt-2 font-mono text-xs"
+          value={featuredImage}
+          onChange={(e) => setFeaturedImage(e.target.value)}
+          placeholder="/media/… atau https://…"
+          aria-label="URL gambar utama"
+        />
+      </SideSection>
+
+      <SideSection title="Kategori">
+        <div className="space-y-1.5">
+          {categories.map((c) => (
+            <label key={c.id} className="flex items-center gap-2 text-sm text-gray-700">
               <input
-                className="ck-input text-lg font-semibold"
-                placeholder="Tulis judul artikel…"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                type="checkbox"
+                className="h-4 w-4 rounded border-gray-300 text-blue-600"
+                checked={categoryIds.has(c.id)}
+                onChange={() => toggleSet(categoryIds, setCategoryIds, c.id)}
+              />
+              {c.name}
+            </label>
+          ))}
+          {categories.length === 0 ? (
+            <p className="text-xs text-gray-400">Belum ada kategori.</p>
+          ) : null}
+        </div>
+      </SideSection>
+
+      <SideSection title="Tag">
+        <div className="space-y-1.5">
+          {tags.map((t) => (
+            <label key={t.id} className="flex items-center gap-2 text-sm text-gray-700">
+              <input
+                type="checkbox"
+                className="h-4 w-4 rounded border-gray-300 text-blue-600"
+                checked={tagIds.has(t.id)}
+                onChange={() => toggleSet(tagIds, setTagIds, t.id)}
+              />
+              {t.name}
+            </label>
+          ))}
+          {tags.length === 0 ? <p className="text-xs text-gray-400">Belum ada tag.</p> : null}
+        </div>
+      </SideSection>
+    </>
+  );
+
+  return (
+    <EditorShell
+      backHref="/admin/posts"
+      heading={isNew ? "Artikel baru" : "Edit artikel"}
+      subheading={
+        post
+          ? `Terakhir diubah ${new Date(post.updatedAt).toLocaleString("id-ID")}`
+          : "Belum disimpan"
+      }
+      actions={actions}
+      panelOpen={panelOpen}
+      onTogglePanel={() => setPanelOpen((v) => !v)}
+      side={side}
+    >
+      <input
+        className="ck-title-input"
+        placeholder="Tambahkan judul"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        aria-label="Judul artikel"
+      />
+      <p className="ck-permalink">
+        Permalink: <span className="font-mono">/blog/{effectiveSlug || "…"}</span>
+      </p>
+
+      <NovelEditor initialContent={post?.contentJson || null} onUpdate={onEditorUpdate} />
+
+      <div className="ck-card mt-6">
+        <Field label="Kutipan / ringkasan (excerpt)">
+          <textarea
+            className="ck-input"
+            rows={3}
+            value={excerpt}
+            onChange={(e) => setExcerpt(e.target.value)}
+            placeholder="Ringkasan singkat untuk daftar artikel & meta description…"
+          />
+        </Field>
+      </div>
+
+      <div className="ck-card mt-4">
+        <button
+          type="button"
+          onClick={() => setSeoOpen((v) => !v)}
+          className="flex w-full items-center justify-between text-left"
+        >
+          <span className="text-sm font-semibold text-gray-800">
+            Pengaturan SEO
+            <span className="ml-2 text-xs font-normal text-gray-400">
+              judul meta, deskripsi, kata kunci fokus
+            </span>
+          </span>
+          <span className="text-gray-400">{seoOpen ? "▾" : "▸"}</span>
+        </button>
+        {seoOpen ? (
+          <div className="mt-4 space-y-4">
+            <Field
+              label="Judul SEO"
+              hint={`${seoTitle.length}/60 karakter — kosongkan untuk memakai judul artikel.`}
+            >
+              <input
+                className="ck-input"
+                maxLength={70}
+                value={seoTitle}
+                onChange={(e) => setSeoTitle(e.target.value)}
+                placeholder={title || "Judul artikel"}
               />
             </Field>
-            <Field label="Slug (URL)" hint={`/blog/${effectiveSlug || "…"}`}>
-              <input
-                className="ck-input font-mono text-xs"
-                value={effectiveSlug}
-                onChange={(e) => {
-                  setSlugTouched(true);
-                  setSlug(e.target.value);
-                }}
-              />
-            </Field>
-          </div>
-
-          <div className="ck-card">
-            <label className="ck-label">Isi artikel</label>
-            <NovelEditor initialContent={post?.contentJson || null} onUpdate={onEditorUpdate} />
-          </div>
-
-          <div className="ck-card">
-            <Field label="Kutipan / ringkasan (excerpt)">
+            <Field label="Deskripsi meta" hint={`${seoDescription.length}/160 karakter.`}>
               <textarea
                 className="ck-input"
                 rows={3}
-                value={excerpt}
-                onChange={(e) => setExcerpt(e.target.value)}
-                placeholder="Ringkasan singkat untuk daftar artikel & meta description…"
+                maxLength={200}
+                value={seoDescription}
+                onChange={(e) => setSeoDescription(e.target.value)}
+                placeholder={excerpt || "Ringkasan untuk hasil pencarian Google…"}
               />
             </Field>
-          </div>
-
-          {/* Panel SEO */}
-          <div className="ck-card">
-            <button
-              type="button"
-              onClick={() => setSeoOpen((v) => !v)}
-              className="flex w-full items-center justify-between text-left"
-            >
-              <span className="text-sm font-semibold text-gray-800">
-                Pengaturan SEO
-                <span className="ml-2 text-xs font-normal text-gray-400">
-                  judul meta, deskripsi, kata kunci fokus
-                </span>
-              </span>
-              <span className="text-gray-400">{seoOpen ? "▾" : "▸"}</span>
-            </button>
-            {seoOpen ? (
-              <div className="mt-4 space-y-4">
-                <Field
-                  label="Judul SEO"
-                  hint={`${seoTitle.length}/60 karakter — kosongkan untuk memakai judul artikel.`}
-                >
-                  <input
-                    className="ck-input"
-                    maxLength={70}
-                    value={seoTitle}
-                    onChange={(e) => setSeoTitle(e.target.value)}
-                    placeholder={title || "Judul artikel"}
-                  />
-                </Field>
-                <Field
-                  label="Deskripsi meta"
-                  hint={`${seoDescription.length}/160 karakter.`}
-                >
-                  <textarea
-                    className="ck-input"
-                    rows={3}
-                    maxLength={200}
-                    value={seoDescription}
-                    onChange={(e) => setSeoDescription(e.target.value)}
-                    placeholder={excerpt || "Ringkasan untuk hasil pencarian Google…"}
-                  />
-                </Field>
-                <Field label="Kata kunci fokus">
-                  <input
-                    className="ck-input"
-                    value={focusKeyword}
-                    onChange={(e) => setFocusKeyword(e.target.value)}
-                    placeholder="mis. syarat cpmi taiwan"
-                  />
-                </Field>
-                <div className="rounded-md bg-gray-50 p-3 ring-1 ring-gray-200">
-                  <p className="text-xs font-medium text-gray-500">Pratinjau hasil pencarian</p>
-                  <p className="mt-1 truncate text-sm text-blue-700">
-                    {seoTitle || title || "Judul artikel"} | CKS
-                  </p>
-                  <p className="text-xs text-emerald-700">
-                    {"situs-cks.id/blog/"}
-                    {effectiveSlug || "…"}
-                  </p>
-                  <p className="mt-0.5 line-clamp-2 text-xs text-gray-500">
-                    {seoDescription || excerpt || "Deskripsi artikel akan tampil di sini…"}
-                  </p>
-                </div>
-              </div>
-            ) : null}
-          </div>
-        </div>
-
-        {/* Sidebar ala WordPress */}
-        <div className="space-y-4">
-          <div className="ck-card space-y-3">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-gray-800">Publikasi</h3>
-              <span
-                className={`ck-badge ${
-                  status === "PUBLISHED"
-                    ? "bg-emerald-100 text-emerald-700"
-                    : status === "PENDING"
-                      ? "bg-amber-100 text-amber-700"
-                      : "bg-gray-100 text-gray-600"
-                }`}
-              >
-                {STATUS_LABEL[status]}
-              </span>
-            </div>
-            <p className="text-xs text-gray-400">
-              {isAdmin
-                ? "Admin dapat menerbitkan langsung atau menyetujui artikel penulis."
-                : "Artikel Anda akan ditinjau admin sebelum terbit."}
-            </p>
-            <div className="flex flex-col gap-2">
-              <button
-                type="button"
-                className="ck-btn-secondary"
-                disabled={Boolean(saving)}
-                onClick={() => save("draft")}
-              >
-                {saving === "draft" ? "Menyimpan…" : "Simpan draft"}
-              </button>
-              {canPublish ? (
-                <button
-                  type="button"
-                  className="ck-btn-primary"
-                  disabled={Boolean(saving)}
-                  onClick={() => save("publish")}
-                >
-                  {saving === "publish"
-                    ? "Menerbitkan…"
-                    : status === "PUBLISHED"
-                      ? "Perbarui"
-                      : status === "PENDING"
-                        ? "Setujui & Terbitkan"
-                        : "Terbitkan"}
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  className="ck-btn-primary"
-                  disabled={Boolean(saving)}
-                  onClick={() => save("submit")}
-                >
-                  {saving === "submit" ? "Mengirim…" : "Kirim untuk ditinjau"}
-                </button>
-              )}
-              {status === "PUBLISHED" && canPublish ? (
-                <button
-                  type="button"
-                  className="ck-btn-secondary"
-                  disabled={Boolean(saving)}
-                  onClick={() => save("unpublish")}
-                >
-                  Tarik ke draft
-                </button>
-              ) : null}
+            <Field label="Kata kunci fokus">
+              <input
+                className="ck-input"
+                value={focusKeyword}
+                onChange={(e) => setFocusKeyword(e.target.value)}
+                placeholder="mis. syarat cpmi taiwan"
+              />
+            </Field>
+            <div className="rounded-md bg-gray-50 p-3 ring-1 ring-gray-200">
+              <p className="text-xs font-medium text-gray-500">Pratinjau hasil pencarian</p>
+              <p className="mt-1 truncate text-sm text-blue-700">
+                {seoTitle || title || "Judul artikel"} | CKS
+              </p>
+              <p className="text-xs text-emerald-700">
+                {"situs-cks.id/blog/"}
+                {effectiveSlug || "…"}
+              </p>
+              <p className="mt-0.5 line-clamp-2 text-xs text-gray-500">
+                {seoDescription || excerpt || "Deskripsi artikel akan tampil di sini…"}
+              </p>
             </div>
           </div>
-
-          <div className="ck-card">
-            <h3 className="mb-3 text-sm font-semibold text-gray-800">Gambar utama</h3>
-            {featuredImage ? (
-              <div className="space-y-2">
-                <img
-                  src={featuredImage}
-                  alt="Gambar utama"
-                  className="aspect-video w-full rounded-md object-cover"
-                />
-                <button
-                  type="button"
-                  className="ck-btn-danger w-full"
-                  onClick={() => setFeaturedImage("")}
-                >
-                  Hapus gambar
-                </button>
-              </div>
-            ) : (
-              <button
-                type="button"
-                className="ck-btn-secondary w-full"
-                disabled={uploading}
-                onClick={() => fileRef.current?.click()}
-              >
-                {uploading ? "Mengunggah…" : "Unggah gambar"}
-              </button>
-            )}
-            <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={pickFeatured} />
-            <p className="mt-2 text-xs text-gray-400">Atau tempel URL gambar:</p>
-            <input
-              className="ck-input mt-1 font-mono text-xs"
-              value={featuredImage}
-              onChange={(e) => setFeaturedImage(e.target.value)}
-              placeholder="/media/… atau https://…"
-            />
-          </div>
-
-          <div className="ck-card">
-            <h3 className="mb-3 text-sm font-semibold text-gray-800">Kategori</h3>
-            <div className="max-h-40 space-y-1.5 overflow-y-auto">
-              {categories.map((c) => (
-                <label key={c.id} className="flex items-center gap-2 text-sm text-gray-700">
-                  <input
-                    type="checkbox"
-                    className="h-4 w-4 rounded border-gray-300 text-blue-600"
-                    checked={categoryIds.has(c.id)}
-                    onChange={() => toggleSet(categoryIds, setCategoryIds, c.id)}
-                  />
-                  {c.name}
-                </label>
-              ))}
-              {categories.length === 0 ? (
-                <p className="text-xs text-gray-400">Belum ada kategori.</p>
-              ) : null}
-            </div>
-          </div>
-
-          <div className="ck-card">
-            <h3 className="mb-3 text-sm font-semibold text-gray-800">Tag</h3>
-            <div className="max-h-40 space-y-1.5 overflow-y-auto">
-              {tags.map((t) => (
-                <label key={t.id} className="flex items-center gap-2 text-sm text-gray-700">
-                  <input
-                    type="checkbox"
-                    className="h-4 w-4 rounded border-gray-300 text-blue-600"
-                    checked={tagIds.has(t.id)}
-                    onChange={() => toggleSet(tagIds, setTagIds, t.id)}
-                  />
-                  {t.name}
-                </label>
-              ))}
-              {tags.length === 0 ? <p className="text-xs text-gray-400">Belum ada tag.</p> : null}
-            </div>
-          </div>
-        </div>
+        ) : null}
       </div>
-    </div>
+    </EditorShell>
   );
 }

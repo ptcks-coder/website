@@ -20,3 +20,14 @@ npm-debug.log*
 uploads/
 *.jar
 ck.jar
+
+# artefak tutorial video (berat, dapat dibuat ulang via scripts/tutorial)
+/scripts/tutorial/electron/node_modules/
+/docs/tutorial/audio/
+/docs/tutorial/audio-segments/
+/docs/tutorial/clips/
+/docs/tutorial/scenes/
+/docs/tutorial/tutorial-lengkap.mp4
+/docs/tutorial/recording.mp4
+/docs/tutorial/narasi.wav
+/docs/tutorial/concat.txt

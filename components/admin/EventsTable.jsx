@@ -10,6 +10,13 @@ const TABS = [
   { key: "draft", label: "Draft" }
 ];
 
+const CalendarIcon = (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+    <rect x="3" y="5" width="18" height="16" rx="2" />
+    <path strokeLinecap="round" d="M8 3v4M16 3v4M3 10h18" />
+  </svg>
+);
+
 function fmtDate(iso) {
   if (!iso) return "—";
   return new Date(iso).toLocaleDateString("id-ID", {
@@ -77,31 +84,31 @@ export default function EventsTable({ role }) {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-1 text-sm">
+        <div className="ck-tabs">
           {TABS.map((t) => {
-            const count = t.key === "published" ? counts["true"] : t.key === "draft" ? counts["false"] : total;
+            const count =
+              t.key === "published" ? counts["true"] : t.key === "draft" ? counts["false"] : total;
             const active = status === t.key;
             return (
               <Link
                 key={t.key}
                 href={t.key ? `/admin/events?status=${t.key}` : "/admin/events"}
-                className={`rounded-md px-3 py-1.5 font-medium ${
-                  active ? "bg-blue-600 text-white" : "text-gray-600 hover:bg-gray-100"
-                }`}
+                className={`ck-tab${active ? " is-active" : ""}`}
               >
-                {t.label} <span className="opacity-70">({count})</span>
+                {t.label}
+                <span className="ck-tab-count">{count}</span>
               </Link>
             );
           })}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex w-full items-center gap-2 sm:w-auto">
           <input
-            className="ck-input w-56"
+            className="ck-input !w-full sm:!w-56"
             placeholder="Cari event…"
             value={q}
             onChange={(e) => setQ(e.target.value)}
           />
-          <Link href="/admin/events/new" className="ck-btn-primary">
+          <Link href="/admin/events/new" className="ck-btn-primary shrink-0">
             + Event baru
           </Link>
         </div>
@@ -110,37 +117,52 @@ export default function EventsTable({ role }) {
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
 
       <div className="ck-card overflow-x-auto p-0">
-        <table className="min-w-full divide-y divide-gray-200 text-sm">
-          <thead className="bg-gray-50">
+        <table className="ck-table">
+          <thead>
             <tr>
-              <th className="px-4 py-3 text-left font-semibold text-gray-600">Event</th>
-              <th className="px-4 py-3 text-left font-semibold text-gray-600">Lokasi</th>
-              <th className="px-4 py-3 text-left font-semibold text-gray-600">Status</th>
-              <th className="px-4 py-3 text-left font-semibold text-gray-600">Tanggal</th>
-              <th className="px-4 py-3 text-right font-semibold text-gray-600">Aksi</th>
+              <th>Event</th>
+              <th>Lokasi</th>
+              <th>Status</th>
+              <th>Tanggal</th>
+              <th className="!text-right">Aksi</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
             {(data?.events || []).map((e) => (
-              <tr key={e.id} className="hover:bg-gray-50">
-                <td className="px-4 py-3">
-                  <Link href={`/admin/events/${e.id}`} className="font-medium text-gray-900 hover:text-blue-700">
+              <tr key={e.id}>
+                <td>
+                  <Link
+                    href={`/admin/events/${e.id}`}
+                    className="font-medium text-gray-900 hover:text-blue-700"
+                  >
                     {e.title}
                   </Link>
                   <span className="block text-xs text-gray-400">/event/{e.slug}</span>
                 </td>
-                <td className="px-4 py-3 text-gray-600">{e.location || "—"}</td>
-                <td className="px-4 py-3">
-                  <span className={`ck-badge ${e.published ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-600"}`}>
+                <td className="text-gray-600">{e.location || "—"}</td>
+                <td>
+                  <span
+                    className={`ck-badge ${
+                      e.published ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-600"
+                    }`}
+                  >
                     {e.published ? "Terbit" : "Draft"}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-gray-500">{fmtDate(e.startAt)}</td>
-                <td className="px-4 py-3">
+                <td className="text-gray-500">{fmtDate(e.startAt)}</td>
+                <td>
                   <div className="flex items-center justify-end gap-1.5 text-xs">
-                    <Link href={`/admin/events/${e.id}`} className="ck-btn-secondary px-2 py-1">Edit</Link>
+                    <Link href={`/admin/events/${e.id}`} className="ck-btn-secondary px-2 py-1">
+                      Edit
+                    </Link>
                     {e.published ? (
-                      <Link href={`/event/${e.slug}`} target="_blank" className="ck-btn-secondary px-2 py-1">Lihat</Link>
+                      <Link
+                        href={`/event/${e.slug}`}
+                        target="_blank"
+                        className="ck-btn-secondary px-2 py-1"
+                      >
+                        Lihat
+                      </Link>
                     ) : null}
                     {isAdmin ? (
                       <button
@@ -159,15 +181,23 @@ export default function EventsTable({ role }) {
             ))}
             {data && data.events.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-4 py-10 text-center text-gray-400">
-                  Tidak ada event.{" "}
-                  <Link href="/admin/events/new" className="text-blue-600 hover:underline">Buat event pertama →</Link>
+                <td colSpan={5}>
+                  <div className="ck-empty">
+                    <span className="ck-empty-icon">{CalendarIcon}</span>
+                    <p className="ck-empty-title">Belum ada event</p>
+                    <p className="ck-empty-desc">Jadwalkan kegiatan pertama Anda.</p>
+                    <Link href="/admin/events/new" className="ck-btn-primary mt-2">
+                      + Buat event
+                    </Link>
+                  </div>
                 </td>
               </tr>
             ) : null}
             {!data && !error ? (
               <tr>
-                <td colSpan={5} className="px-4 py-10 text-center text-gray-400">Memuat…</td>
+                <td colSpan={5} className="py-14 text-center text-sm text-gray-400">
+                  Memuat…
+                </td>
               </tr>
             ) : null}
           </tbody>

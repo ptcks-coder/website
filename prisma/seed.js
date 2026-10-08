@@ -193,6 +193,47 @@ async function main() {
     await prisma.galleryItem.createMany({ data: gallery });
   }
 
+  // ——— Slider beranda ———
+  const heroCount = await prisma.heroSlide.count();
+  if (heroCount === 0) {
+    await prisma.heroSlide.createMany({
+      data: [
+        {
+          title: "Penempatan CPMI terarah",
+          subtitle: "Pendampingan dari minat lowongan hingga persiapan dokumen dan BLK.",
+          image: DEMO.hero,
+          ctaLabel: "Daftar CPMI",
+          ctaHref: "/daftar",
+          sortOrder: 1
+        },
+        {
+          title: "Siap menuju Taiwan",
+          subtitle: "Contoh minat caregiver, pabrik, dan sektor informal.",
+          image: DEMO.taiwan,
+          ctaLabel: "Lihat lowongan",
+          ctaHref: "/lowongan",
+          sortOrder: 2
+        },
+        {
+          title: "Peluang di Hong Kong",
+          subtitle: "Informasi umum PRT dan perawat lansia — detail saat daftar.",
+          image: DEMO.hongkong,
+          ctaLabel: "Daftar CPMI",
+          ctaHref: "/daftar",
+          sortOrder: 3
+        },
+        {
+          title: "Malaysia & Singapura",
+          subtitle: "Contoh minat produksi dan jasa untuk calon pekerja migran.",
+          image: DEMO.malaysia,
+          ctaLabel: "Daftar CPMI",
+          ctaHref: "/daftar",
+          sortOrder: 4
+        }
+      ]
+    });
+  }
+
   // ——— Cabang ———
   const branches = [
     { kode: "MDC", nama: "MANADO" },

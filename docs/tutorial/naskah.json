@@ -1,0 +1,137 @@
+{
+  "voice": "Leda",
+  "model": "gemini-3.8-flash-tts",
+  "language": "id-ID",
+  "scenes": [
+    {
+      "id": "01-login",
+      "title": "Cara akses & masuk ke panel admin",
+      "text": "Cara masuk ke panel admin. Buka alamat website CKS, lalu tambahkan garis miring admin di akhir alamat. Halaman akan diarahkan ke formulir login. Masukkan email dan kata sandi petugas, kemudian klik tombol Masuk."
+    },
+    {
+      "id": "02-dashboard",
+      "title": "Dashboard dan fungsinya",
+      "text": "Setelah masuk, kita disambut dashboard. Fungsinya memberi ringkasan cepat: jumlah kunjungan hari ini dan tujuh hari terakhir, jumlah artikel, event mendatang, pendaftar baru, serta pesan yang belum dibaca. Di bawahnya ada grafik kunjungan tiga puluh hari dan daftar artikel terbaru."
+    },
+    {
+      "id": "03-slider",
+      "title": "Menu Slider Beranda",
+      "text": "Di grup Konten, ada menu Slider Beranda. Fungsinya mengatur gambar besar yang tampil di halaman depan. Kita bisa melihat daftar slide, menambah slide baru dengan judul, subjudul, gambar, label dan tautan tombol, mengatur urutan, lalu menyimpannya."
+    },
+    {
+      "id": "04-artikel-daftar",
+      "title": "Menu Artikel",
+      "text": "Menu Artikel berfungsi mengelola tulisan blog. Tab di atas menyaring berdasarkan status: semua, terbit, menunggu persetujuan, dan draft. Kita juga bisa mencari judul, lalu mengedit, melihat, menyetujui, atau menghapus artikel."
+    },
+    {
+      "id": "05-artikel-editor",
+      "title": "Fungsi editor artikel",
+      "text": "Saat menulis artikel, editor tampil layar penuh. Di kiri ada judul dan isi tulisan, di kanan panel Dokumen untuk permalink, gambar utama, kategori, tag, dan pengaturan SEO. Toolbar di atas menyediakan judul, tebal, miring, daftar, kutipan, tautan, gambar, video YouTube, rumus, dan blok kode. Bila siap, klik Terbitkan."
+    },
+    {
+      "id": "06-galeri",
+      "title": "Menu Galeri",
+      "text": "Menu Galeri berfungsi mengelola foto dan video kegiatan. Tersedia filter tipe dan kategori serta kolom pencarian. Tombol Tambah media untuk mengunggah berkas baru, dan setiap kartu bisa ditampilkan atau dihapus."
+    },
+    {
+      "id": "07-event",
+      "title": "Menu Event",
+      "text": "Menu Event untuk mengelola agenda kegiatan, seperti sosialisasi dan pembukaan kelas. Kita dapat membuat event baru dengan judul, waktu mulai dan selesai, lokasi, gambar, serta status terbit."
+    },
+    {
+      "id": "08-kategori",
+      "title": "Menu Kategori",
+      "text": "Pada grup Referensi terdapat Kategori. Fungsinya mengelompokkan artikel, misalnya Panduan, Dokumen, atau Informasi. Kategori ini yang muncul sebagai label pada daftar blog."
+    },
+    {
+      "id": "09-tag",
+      "title": "Menu Tag",
+      "text": "Selanjutnya Tag. Berbeda dengan kategori, tag bersifat lebih bebas dan spesifik, misalnya penempatan, dokumen, atau nama negara. Tag membantu pengunjung menemukan artikel terkait."
+    },
+    {
+      "id": "10-lowongan",
+      "title": "Menu Lowongan",
+      "text": "Di grup Informasi ada menu Lowongan. Fungsinya menyimpan informasi negara dan posisi yang ditawarkan. Setiap lowongan punya kode negara, posisi, keterangan, gambar, status aktif, dan urutan tampil."
+    },
+    {
+      "id": "11-cabang",
+      "title": "Menu Cabang",
+      "text": "Menu Cabang berisi daftar kantor cabang CKS. Di sini kita mengelola kode cabang, nama, alamat, nomor telepon, dan status aktifnya."
+    },
+    {
+      "id": "12-pendaftaran",
+      "title": "Menu Pendaftaran",
+      "text": "Grup Masuk berisi menu Pendaftaran. Semua data pendaftar dari website terkumpul di sini, lengkap dengan nomor pendaftaran, kontak, negara tujuan, dan catatan. Statusnya dapat diubah menjadi diproses, diterima, atau ditolak."
+    },
+    {
+      "id": "13-pesan",
+      "title": "Menu Pesan Masuk",
+      "text": "Menu Pesan Masuk menampung pesan dari formulir kontak. Klik salah satu pesan untuk membuka detailnya, dan statusnya otomatis berubah menjadi sudah dibaca."
+    },
+    {
+      "id": "14-pengguna",
+      "title": "Menu Pengguna",
+      "text": "Pada grup Sistem ada menu Pengguna. Fungsinya mengatur akun yang bisa masuk ke admin, lengkap dengan nama, email, kata sandi, dan perannya. Peran Admin memiliki akses penuh, sedangkan Penulis hanya mengelola artikelnya sendiri dan harus menunggu persetujuan untuk terbit."
+    },
+    {
+      "id": "15-pengaturan",
+      "title": "Menu Pengaturan",
+      "text": "Menu Pengaturan berfungsi mengisi identitas website: judul situs, tagline, deskripsi meta, alamat dan kontak kantor, jam kerja, media sosial, serta integrasi Google Analytics dan Search Console. Jangan lupa klik Simpan pengaturan."
+    },
+    {
+      "id": "16-publik-beranda",
+      "title": "Halaman beranda",
+      "text": "Sekarang kita lihat hasilnya di halaman publik. Beranda menampilkan slider, informasi lowongan, profil singkat, event mendatang, pertanyaan umum, dan artikel terbaru. Semua konten ini berasal dari admin yang tadi kita isi."
+    },
+    {
+      "id": "17-publik-profil",
+      "title": "Halaman profil",
+      "text": "Halaman Profil menjelaskan tentang perusahaan, layanan utama, dan negara tujuan penempatan."
+    },
+    {
+      "id": "18-publik-layanan",
+      "title": "Halaman layanan",
+      "text": "Halaman Layanan memuat tiga fokus operasional dan infografis alur penempatan calon pekerja migran, dari pengurusan dokumen hingga keberangkatan dan kepulangan."
+    },
+    {
+      "id": "19-publik-lowongan",
+      "title": "Halaman lowongan",
+      "text": "Halaman Lowongan menampilkan kartu informasi per negara dengan tombol menuju formulir pendaftaran."
+    },
+    {
+      "id": "20-publik-galeri",
+      "title": "Halaman galeri",
+      "text": "Halaman Galeri menampilkan dokumentasi foto dan video dalam bentuk grid. Klik salah satu untuk memperbesar."
+    },
+    {
+      "id": "21-publik-event",
+      "title": "Halaman event",
+      "text": "Halaman Event menampilkan agenda yang akan datang beserta lokasi dan waktunya, serta arsip kegiatan sebelumnya."
+    },
+    {
+      "id": "22-publik-cabang",
+      "title": "Halaman cabang",
+      "text": "Halaman Cabang memperlihatkan daftar kantor cabang beserta kode dan alamatnya."
+    },
+    {
+      "id": "23-publik-blog",
+      "title": "Halaman blog",
+      "text": "Halaman Blog berisi daftar artikel yang sudah terbit. Setiap artikel memiliki halaman detail dengan gambar utama, isi lengkap, kategori, dan tag."
+    },
+    {
+      "id": "24-publik-kontak",
+      "title": "Halaman kontak",
+      "text": "Halaman Kontak menampilkan informasi kantor, jam kerja, peta, dan formulir pesan. Pesan yang dikirim akan masuk ke menu Pesan Masuk di admin."
+    },
+    {
+      "id": "25-publik-daftar",
+      "title": "Halaman daftar CPMI",
+      "text": "Terakhir, halaman Daftar CPMI. Pengunjung mengisi data pribadi dan minat penempatan. Data ini langsung masuk ke menu Pendaftaran di admin untuk ditindaklanjuti petugas."
+    },
+    {
+      "id": "26-outro",
+      "title": "Penutup",
+      "text": "Demikian tutorial lengkap pengelolaan website CKS. Dari pengaturan, slider, artikel, galeri, event, lowongan, cabang, hingga pendaftaran dan pesan masuk. Selamat mencoba, dan sampai jumpa."
+    }
+  ]
+}

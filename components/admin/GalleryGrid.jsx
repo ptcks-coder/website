@@ -5,6 +5,14 @@ import { useRouter } from "next/navigation";
 
 const PAGE_SIZE = 12;
 
+const ImageIcon = (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+    <rect x="3" y="5" width="18" height="14" rx="2" />
+    <circle cx="9" cy="10" r="1.6" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="m5 18 5-5 3 3 3-3 3 3" />
+  </svg>
+);
+
 function fmtDate(iso) {
   if (!iso) return "—";
   return new Date(iso).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
@@ -172,7 +180,7 @@ export default function GalleryGrid({ role }) {
           ))}
         </select>
         <input
-          className="ck-input !w-48 min-w-0 shrink sm:!w-56"
+          className="ck-input !w-full min-w-0 sm:!w-56"
           placeholder="Cari galeri…"
           value={q}
           onChange={(e) => setQ(e.target.value)}
@@ -180,7 +188,7 @@ export default function GalleryGrid({ role }) {
         />
         <button
           type="button"
-          className="ck-btn-primary ml-auto shrink-0"
+          className="ck-btn-primary shrink-0 sm:ml-auto"
           onClick={() => setShowForm((v) => !v)}
         >
           {showForm ? "Tutup form" : "+ Tambah media"}
@@ -283,12 +291,14 @@ export default function GalleryGrid({ role }) {
 
       <div className="ck-card p-5">
         {data?.items?.length === 0 ? (
-          <p className="py-10 text-center text-gray-400">
-            Tidak ada media.{" "}
-            <button type="button" className="text-blue-600 hover:underline" onClick={() => setShowForm(true)}>
-              Tambah media pertama →
+          <div className="ck-empty">
+            <span className="ck-empty-icon">{ImageIcon}</span>
+            <p className="ck-empty-title">Belum ada media</p>
+            <p className="ck-empty-desc">Unggah foto atau video pertama Anda.</p>
+            <button type="button" className="ck-btn-primary mt-2" onClick={() => setShowForm(true)}>
+              + Tambah media
             </button>
-          </p>
+          </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {(data?.items || []).map((item) => {
@@ -296,7 +306,7 @@ export default function GalleryGrid({ role }) {
               return (
                 <div
                   key={item.id}
-                  className="group relative overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition hover:shadow-md"
+                  className="group relative overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md"
                 >
                   <div className="relative aspect-square overflow-hidden bg-gray-100">
                     {video ? (

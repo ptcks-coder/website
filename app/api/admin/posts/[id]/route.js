@@ -76,7 +76,12 @@ export async function PUT(request, { params }) {
   const slug = await uniqueSlug(body.slug || title, postId);
   const contentJson =
     body.contentJson && typeof body.contentJson === "object" ? body.contentJson : existing.contentJson;
-  const contentHtml = contentJson ? docToHtml(contentJson) : existing.contentHtml;
+  const contentHtml =
+    typeof body.contentHtml === "string" && body.contentHtml.trim()
+      ? body.contentHtml
+      : contentJson
+        ? docToHtml(contentJson)
+        : existing.contentHtml;
 
   const wasPublished = existing.status === "PUBLISHED";
   const publishedAt =

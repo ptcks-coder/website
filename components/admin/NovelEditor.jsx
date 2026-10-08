@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
   EditorRoot,
   EditorContent,
@@ -34,10 +34,18 @@ import {
   UploadImagesPlugin,
   TextStyle,
   Color,
-  ImageResizer
+  ImageResizer,
+  AIHighlight,
+  CodeBlockLowlight,
+  Mathematics,
+  Twitter
 } from "novel";
+import EditorToolbar from "@/components/admin/EditorToolbar";
+import { createLowlight, common } from "lowlight";
+import "katex/dist/katex.min.css";
 
 const MAX_SIZE = 10 * 1024 * 1024;
+const lowlight = createLowlight(common);
 
 async function uploadToServer(file) {
   const fd = new FormData();
@@ -116,6 +124,16 @@ const Icon = {
   Link: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
       <path strokeLinecap="round" d="M10 14a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1.2 1M14 10a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1.2-1" />
+    </svg>
+  ),
+  Twitter: (
+    <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
+      <path d="M18.9 2H22l-7.1 8.1L23 22h-6.6l-5.2-6.8L5.3 22H2.2l7.6-8.7L1.7 2h6.8l4.7 6.2L18.9 2Zm-1.1 18h1.7L7.3 3.8H5.5L17.8 20Z" />
+    </svg>
+  ),
+  Math: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+      <path d="M18 4H6l6 8-6 8h12" />
     </svg>
   )
 };
@@ -212,6 +230,30 @@ const suggestionItems = createSuggestionItems([
         editor.chain().focus().deleteRange(range).setYoutubeVideo({ src: url }).run();
       }
     }
+  },
+  {
+    title: "Twitter",
+    description: "Sematkan tweet (X).",
+    icon: Icon.Twitter,
+    searchTerms: ["twitter", "x", "tweet"],
+    command: ({ editor, range }) => {
+      const url = window.prompt("Tempel URL tweet (X):");
+      if (url) {
+        editor.chain().focus().deleteRange(range).setTweet({ src: url }).run();
+      }
+    }
+  },
+  {
+    title: "Rumus (LaTeX)",
+    description: "Sisipkan rumus matematika.",
+    icon: Icon.Math,
+    searchTerms: ["math", "latex", "rumus", "formula", "equation"],
+    command: ({ editor, range }) => {
+      const latex = window.prompt("Masukkan LaTeX (mis. E = mc^2):");
+      if (latex) {
+        editor.chain().focus().deleteRange(range).setLatex({ latex }).run();
+      }
+    }
   }
 ]);
 
@@ -233,12 +275,15 @@ const tipTapImage = TiptapImage.extend({
 });
 
 export default function NovelEditor({ initialContent, onUpdate }) {
+  const [editor, setEditor] = useState(null);
+
   const extensions = useMemo(
     () => [
       StarterKit.configure({
         bulletList: { HTMLAttributes: { class: "list-disc list-outside" } },
         orderedList: { HTMLAttributes: { class: "list-decimal list-outside" } },
-        horizontalRule: false
+        horizontalRule: false,
+        codeBlock: false
       }),
       Placeholder.configure({
         placeholder: ({ node }) =>
@@ -260,6 +305,10 @@ export default function NovelEditor({ initialContent, onUpdate }) {
       TextStyle,
       Color,
       Youtube.configure({ width: 640, height: 360, HTMLAttributes: { class: "rounded-lg" } }),
+      Twitter.configure({ inline: false }),
+      Mathematics.configure({ katexOptions: { throwOnError: false } }),
+      CodeBlockLowlight.configure({ lowlight }),
+      AIHighlight,
       CharacterCount,
       CustomKeymap,
       GlobalDragHandle,
@@ -268,27 +317,47 @@ export default function NovelEditor({ initialContent, onUpdate }) {
     []
   );
 
+  const insertImage = useCallback(() => {
+    if (!editor) return;
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = () => {
+      if (!input.files?.length) return;
+      const file = input.files[0];
+      const pos = editor.view.state.selection.from;
+      uploadFn(file, editor.view, pos);
+    };
+    input.click();
+  }, [editor]);
+
   return (
     <EditorRoot>
-      <EditorContent
-        immediatelyRender={false}
-        initialContent={initialContent || undefined}
-        extensions={extensions}
-        className="ck-editor-wrap relative min-h-[420px] w-full rounded-lg border border-gray-200 bg-white"
-        editorProps={{
-          handleDOMEvents: {
-            keydown: (_view, event) => handleCommandNavigation(event)
-          },
-          handlePaste: (view, event) => handleImagePaste(view, event, uploadFn),
-          handleDrop: (view, event, _slice, moved) => handleImageDrop(view, event, moved, uploadFn),
-          attributes: {
-            class:
-              "prose prose-base max-w-none prose-headings:font-bold focus:outline-none text-gray-800"
-          }
-        }}
-        onUpdate={({ editor }) => onUpdate?.(editor.getJSON())}
-        slotAfter={<ImageResizer />}
-      >
+      <div className="ck-editor-shell">
+        <EditorToolbar editor={editor} onInsertImage={insertImage} />
+        <EditorContent
+          immediatelyRender={false}
+          initialContent={initialContent || undefined}
+          extensions={extensions}
+          onCreate={({ editor }) => {
+            setEditor(editor);
+            onUpdate?.(editor.getJSON(), editor.getHTML());
+          }}
+          className="ck-editor-wrap relative min-h-[420px] w-full"
+          editorProps={{
+            handleDOMEvents: {
+              keydown: (_view, event) => handleCommandNavigation(event)
+            },
+            handlePaste: (view, event) => handleImagePaste(view, event, uploadFn),
+            handleDrop: (view, event, _slice, moved) => handleImageDrop(view, event, moved, uploadFn),
+            attributes: {
+              class:
+                "prose prose-base max-w-none prose-headings:font-bold focus:outline-none text-gray-800"
+            }
+          }}
+          onUpdate={({ editor }) => onUpdate?.(editor.getJSON(), editor.getHTML())}
+          slotAfter={<ImageResizer />}
+        >
         <EditorCommand className="z-50 h-auto max-h-[330px] w-72 overflow-y-auto rounded-lg border border-gray-200 bg-white px-1 py-2 shadow-xl">
           <EditorCommandEmpty className="px-2 text-sm text-gray-500">
             Tidak ada hasil
@@ -371,7 +440,8 @@ export default function NovelEditor({ initialContent, onUpdate }) {
             {Icon.Link}
           </EditorBubbleItem>
         </EditorBubble>
-      </EditorContent>
+        </EditorContent>
+      </div>
     </EditorRoot>
   );
 }

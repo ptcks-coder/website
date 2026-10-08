@@ -1,0 +1,241 @@
+{
+  "fps": 30,
+  "width": 1366,
+  "height": 720,
+  "scenes": [
+    {
+      "id": "01-login",
+      "title": "Cara akses & masuk ke panel admin",
+      "frames": 652,
+      "ms": 21763,
+      "audioMs": 15000,
+      "targetMs": 16500,
+      "file": "C:\\Users\\gugus\\Documents\\pjtki\\website\\docs\\tutorial\\clips\\01-login.mp4"
+    },
+    {
+      "id": "02-dashboard",
+      "title": "Dashboard dan fungsinya",
+      "frames": 591,
+      "ms": 19723,
+      "audioMs": 18160,
+      "targetMs": 19660,
+      "file": "C:\\Users\\gugus\\Documents\\pjtki\\website\\docs\\tutorial\\clips\\02-dashboard.mp4"
+    },
+    {
+      "id": "03-slider",
+      "title": "Menu Slider Beranda",
+      "frames": 568,
+      "ms": 18955,
+      "audioMs": 17400,
+      "targetMs": 18900,
+      "file": "C:\\Users\\gugus\\Documents\\pjtki\\website\\docs\\tutorial\\clips\\03-slider.mp4"
+    },
+    {
+      "id": "04-artikel-daftar",
+      "title": "Menu Artikel",
+      "frames": 540,
+      "ms": 18026,
+      "audioMs": 16480,
+      "targetMs": 17980,
+      "file": "C:\\Users\\gugus\\Documents\\pjtki\\website\\docs\\tutorial\\clips\\04-artikel-daftar.mp4"
+    },
+    {
+      "id": "05-artikel-editor",
+      "title": "Fungsi editor artikel",
+      "frames": 873,
+      "ms": 29135,
+      "audioMs": 27600,
+      "targetMs": 29100,
+      "file": "C:\\Users\\gugus\\Documents\\pjtki\\website\\docs\\tutorial\\clips\\05-artikel-editor.mp4"
+    },
+    {
+      "id": "06-galeri",
+      "title": "Menu Galeri",
+      "frames": 459,
+      "ms": 15308,
+      "audioMs": 13720,
+      "targetMs": 15220,
+      "file": "C:\\Users\\gugus\\Documents\\pjtki\\website\\docs\\tutorial\\clips\\06-galeri.mp4"
+    },
+    {
+      "id": "07-event",
+      "title": "Menu Event",
+      "frames": 447,
+      "ms": 14920,
+      "audioMs": 12480,
+      "targetMs": 13980,
+      "file": "C:\\Users\\gugus\\Documents\\pjtki\\website\\docs\\tutorial\\clips\\07-event.mp4"
+    },
+    {
+      "id": "08-kategori",
+      "title": "Menu Kategori",
+      "frames": 439,
+      "ms": 14657,
+      "audioMs": 13120,
+      "targetMs": 14620,
+      "file": "C:\\Users\\gugus\\Documents\\pjtki\\website\\docs\\tutorial\\clips\\08-kategori.mp4"
+    },
+    {
+      "id": "09-tag",
+      "title": "Menu Tag",
+      "frames": 474,
+      "ms": 15819,
+      "audioMs": 14200,
+      "targetMs": 15700,
+      "file": "C:\\Users\\gugus\\Documents\\pjtki\\website\\docs\\tutorial\\clips\\09-tag.mp4"
+    },
+    {
+      "id": "10-lowongan",
+      "title": "Menu Lowongan",
+      "frames": 508,
+      "ms": 16960,
+      "audioMs": 15360,
+      "targetMs": 16860,
+      "file": "C:\\Users\\gugus\\Documents\\pjtki\\website\\docs\\tutorial\\clips\\10-lowongan.mp4"
+    },
+    {
+      "id": "11-cabang",
+      "title": "Menu Cabang",
+      "frames": 346,
+      "ms": 11561,
+      "audioMs": 10000,
+      "targetMs": 11500,
+      "file": "C:\\Users\\gugus\\Documents\\pjtki\\website\\docs\\tutorial\\clips\\11-cabang.mp4"
+    },
+    {
+      "id": "12-pendaftaran",
+      "title": "Menu Pendaftaran",
+      "frames": 541,
+      "ms": 18071,
+      "audioMs": 16440,
+      "targetMs": 17940,
+      "file": "C:\\Users\\gugus\\Documents\\pjtki\\website\\docs\\tutorial\\clips\\12-pendaftaran.mp4"
+    },
+    {
+      "id": "13-pesan",
+      "title": "Menu Pesan Masuk",
+      "frames": 375,
+      "ms": 12522,
+      "audioMs": 10960,
+      "targetMs": 12460,
+      "file": "C:\\Users\\gugus\\Documents\\pjtki\\website\\docs\\tutorial\\clips\\13-pesan.mp4"
+    },
+    {
+      "id": "14-pengguna",
+      "title": "Menu Pengguna",
+      "frames": 613,
+      "ms": 20462,
+      "audioMs": 18920,
+      "targetMs": 20420,
+      "file": "C:\\Users\\gugus\\Documents\\pjtki\\website\\docs\\tutorial\\clips\\14-pengguna.mp4"
+    },
+    {
+      "id": "15-pengaturan",
+      "title": "Menu Pengaturan",
+      "frames": 552,
+      "ms": 18443,
+      "audioMs": 16840,
+      "targetMs": 18340,
+      "file": "C:\\Users\\gugus\\Documents\\pjtki\\website\\docs\\tutorial\\clips\\15-pengaturan.mp4"
+    },
+    {
+      "id": "16-publik-beranda",
+      "title": "Halaman beranda",
+      "frames": 515,
+      "ms": 17182,
+      "audioMs": 15600,
+      "targetMs": 17100,
+      "file": "C:\\Users\\gugus\\Documents\\pjtki\\website\\docs\\tutorial\\clips\\16-publik-beranda.mp4"
+    },
+    {
+      "id": "17-publik-profil",
+      "title": "Halaman profil",
+      "frames": 245,
+      "ms": 8197,
+      "audioMs": 6600,
+      "targetMs": 8100,
+      "file": "C:\\Users\\gugus\\Documents\\pjtki\\website\\docs\\tutorial\\clips\\17-publik-profil.mp4"
+    },
+    {
+      "id": "18-publik-layanan",
+      "title": "Halaman layanan",
+      "frames": 365,
+      "ms": 12191,
+      "audioMs": 10640,
+      "targetMs": 12140,
+      "file": "C:\\Users\\gugus\\Documents\\pjtki\\website\\docs\\tutorial\\clips\\18-publik-layanan.mp4"
+    },
+    {
+      "id": "19-publik-lowongan",
+      "title": "Halaman lowongan",
+      "frames": 235,
+      "ms": 7842,
+      "audioMs": 6240,
+      "targetMs": 7740,
+      "file": "C:\\Users\\gugus\\Documents\\pjtki\\website\\docs\\tutorial\\clips\\19-publik-lowongan.mp4"
+    },
+    {
+      "id": "20-publik-galeri",
+      "title": "Halaman galeri",
+      "frames": 236,
+      "ms": 7885,
+      "audioMs": 6280,
+      "targetMs": 7780,
+      "file": "C:\\Users\\gugus\\Documents\\pjtki\\website\\docs\\tutorial\\clips\\20-publik-galeri.mp4"
+    },
+    {
+      "id": "21-publik-event",
+      "title": "Halaman event",
+      "frames": 274,
+      "ms": 9149,
+      "audioMs": 7560,
+      "targetMs": 9060,
+      "file": "C:\\Users\\gugus\\Documents\\pjtki\\website\\docs\\tutorial\\clips\\21-publik-event.mp4"
+    },
+    {
+      "id": "22-publik-cabang",
+      "title": "Halaman cabang",
+      "frames": 189,
+      "ms": 6330,
+      "audioMs": 4720,
+      "targetMs": 6220,
+      "file": "C:\\Users\\gugus\\Documents\\pjtki\\website\\docs\\tutorial\\clips\\22-publik-cabang.mp4"
+    },
+    {
+      "id": "23-publik-blog",
+      "title": "Halaman blog",
+      "frames": 359,
+      "ms": 11988,
+      "audioMs": 10400,
+      "targetMs": 11900,
+      "file": "C:\\Users\\gugus\\Documents\\pjtki\\website\\docs\\tutorial\\clips\\23-publik-blog.mp4"
+    },
+    {
+      "id": "24-publik-kontak",
+      "title": "Halaman kontak",
+      "frames": 369,
+      "ms": 12317,
+      "audioMs": 10720,
+      "targetMs": 12220,
+      "file": "C:\\Users\\gugus\\Documents\\pjtki\\website\\docs\\tutorial\\clips\\24-publik-kontak.mp4"
+    },
+    {
+      "id": "25-publik-daftar",
+      "title": "Halaman daftar CPMI",
+      "frames": 381,
+      "ms": 12719,
+      "audioMs": 11160,
+      "targetMs": 12660,
+      "file": "C:\\Users\\gugus\\Documents\\pjtki\\website\\docs\\tutorial\\clips\\25-publik-daftar.mp4"
+    },
+    {
+      "id": "26-outro",
+      "title": "Penutup",
+      "frames": 488,
+      "ms": 16286,
+      "audioMs": 14720,
+      "targetMs": 16220,
+      "file": "C:\\Users\\gugus\\Documents\\pjtki\\website\\docs\\tutorial\\clips\\26-outro.mp4"
+    }
+  ]
+}

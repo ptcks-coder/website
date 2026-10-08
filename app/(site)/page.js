@@ -2,7 +2,7 @@ import Link from "next/link";
 import HeroSlider from "@/components/HeroSlider";
 import { COMPANY, FAQ_ITEMS } from "@/data/site";
 import { getLowonganImage, getBlogImage, DEMO_IMAGES } from "@/lib/demo-images";
-import { getPublishedPosts, getActiveJobs, getEvents } from "@/lib/queries";
+import { getPublishedPosts, getActiveJobs, getEvents, getHeroSlides } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
 
@@ -15,15 +15,16 @@ function fmtDate(iso) {
 }
 
 export default async function HomePage() {
-  const [jobs, posts, events] = await Promise.all([
+  const [jobs, posts, events, heroSlides] = await Promise.all([
     getActiveJobs(),
     getPublishedPosts(3),
-    getEvents({ upcomingOnly: true, limit: 3 })
+    getEvents({ upcomingOnly: true, limit: 3 }),
+    getHeroSlides()
   ]);
 
   return (
     <>
-      <HeroSlider />
+      <HeroSlider slides={heroSlides} />
 
       <section className="section" id="lowongan">
         <div className="container">

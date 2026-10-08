@@ -3,6 +3,7 @@
 import { useCallback, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
+import EditorShell from "@/components/admin/EditorShell";
 
 const NovelEditor = dynamic(() => import("@/components/admin/NovelEditor"), {
   ssr: false,
@@ -51,6 +52,20 @@ function Field({ label, children, hint }) {
   );
 }
 
+function SideSection({ title, children, defaultOpen = true }) {
+  return (
+    <details className="ck-side-section" open={defaultOpen}>
+      <summary className="ck-side-section-head">
+        <span>{title}</span>
+        <svg viewBox="0 0 24 24" className="ck-side-chevron" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="m6 9 6 6 6-6" />
+        </svg>
+      </summary>
+      <div className="ck-side-section-body">{children}</div>
+    </details>
+  );
+}
+
 export default function EventEditor({ event }) {
   const router = useRouter();
   const isNew = !event?.id;
@@ -64,16 +79,19 @@ export default function EventEditor({ event }) {
   const [endAt, setEndAt] = useState(toLocalInput(event?.endAt));
   const [image, setImage] = useState(event?.image || "");
   const [published, setPublished] = useState(event?.published ?? true);
+  const [panelOpen, setPanelOpen] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState(null);
   const [uploading, setUploading] = useState(false);
   const longDescRef = useRef(event?.longDescriptionJson || null);
+  const longHtmlRef = useRef(event?.longDescriptionHtml || "");
   const fileRef = useRef(null);
 
   const effectiveSlug = slugTouched ? slug : slugifyLocal(title);
 
-  const onEditorUpdate = useCallback((json) => {
+  const onEditorUpdate = useCallback((json, html) => {
     longDescRef.current = json;
+    if (typeof html === "string") longHtmlRef.current = html;
   }, []);
 
   async function save() {
@@ -85,6 +103,7 @@ export default function EventEditor({ event }) {
         slug: effectiveSlug,
         shortDescription,
         longDescriptionJson: longDescRef.current,
+        longDescriptionHtml: longHtmlRef.current,
         location,
         startAt,
         endAt,
@@ -129,148 +148,151 @@ export default function EventEditor({ event }) {
     }
   }
 
-  return (
-    <div className="space-y-4">
+  const actions = (
+    <>
       {message ? (
-        <div
-          className={`rounded-md px-3 py-2 text-sm ${
-            message.type === "ok" ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200" : "bg-red-50 text-red-700 ring-1 ring-red-200"
+        <span
+          className={`hidden text-xs sm:inline ${
+            message.type === "ok" ? "text-emerald-600" : "text-red-600"
           }`}
         >
           {message.text}
-        </div>
+        </span>
       ) : null}
+      <button type="button" className="ck-btn-primary" disabled={saving} onClick={save}>
+        {saving ? "Menyimpan…" : isNew ? "Terbitkan event" : "Perbarui"}
+      </button>
+    </>
+  );
 
-      <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
-        <div className="space-y-4">
-          <div className="ck-card space-y-4">
-            <Field label="Judul Event">
-              <input
-                className="ck-input text-lg font-semibold"
-                placeholder="Nama event…"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-              />
-            </Field>
-            <Field label="Slug (URL)" hint={`/event/${effectiveSlug || "…"}`}>
-              <input
-                className="ck-input font-mono text-xs"
-                value={effectiveSlug}
-                onChange={(e) => {
-                  setSlugTouched(true);
-                  setSlug(e.target.value);
-                }}
-              />
-            </Field>
-          </div>
+  const side = (
+    <>
+      <SideSection title="Status &amp; visibilitas">
+        <label className="flex items-center gap-2 text-sm text-gray-700">
+          <input
+            type="checkbox"
+            className="h-4 w-4 rounded border-gray-300 text-blue-600"
+            checked={published}
+            onChange={(e) => setPublished(e.target.checked)}
+          />
+          Tampilkan di website
+        </label>
+        <span
+          className={`ck-badge ${
+            published ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-600"
+          }`}
+        >
+          {published ? "Terbit" : "Draft"}
+        </span>
+      </SideSection>
 
-          <div className="ck-card">
-            <Field label="Deskripsi Singkat" hint="Tampil di daftar event & meta." />
-            <textarea
-              className="ck-input"
-              rows={4}
-              value={shortDescription}
-              onChange={(e) => setShortDescription(e.target.value)}
-              placeholder="Ringkasan singkat event…"
-            />
-          </div>
+      <SideSection title="Permalink">
+        <input
+          className="ck-input font-mono text-xs"
+          value={effectiveSlug}
+          onChange={(e) => {
+            setSlugTouched(true);
+            setSlug(e.target.value);
+          }}
+          aria-label="Slug URL"
+        />
+        <p className="mt-1 break-all text-xs text-gray-400">/event/{effectiveSlug || "…"}</p>
+      </SideSection>
 
-          <div className="ck-card">
-            <label className="ck-label">Deskripsi Lengkap</label>
-            <p className="mb-2 text-xs text-gray-400">Gunakan editor di bawah — ketik “/” untuk perintah.</p>
-            <NovelEditor initialContent={event?.longDescriptionJson || null} onUpdate={onEditorUpdate} />
-          </div>
-        </div>
+      <SideSection title="Waktu &amp; lokasi">
+        <Field label="Waktu mulai">
+          <input
+            type="datetime-local"
+            className="ck-input"
+            value={startAt}
+            onChange={(e) => setStartAt(e.target.value)}
+          />
+        </Field>
+        <Field label="Waktu selesai (opsional)">
+          <input
+            type="datetime-local"
+            className="ck-input"
+            value={endAt}
+            onChange={(e) => setEndAt(e.target.value)}
+          />
+        </Field>
+        <Field label="Lokasi">
+          <input
+            className="ck-input"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            placeholder="Kantor Pusat CKS — Malang"
+          />
+        </Field>
+      </SideSection>
 
-        <div className="space-y-4">
-          <div className="ck-card space-y-3">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-gray-800">Publikasi</h3>
-              <span className={`ck-badge ${published ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-600"}`}>
-                {published ? "Terbit" : "Draft"}
-              </span>
-            </div>
-            <div className="flex flex-col gap-2">
-              <button
-                type="button"
-                className="ck-btn-primary"
-                disabled={saving}
-                onClick={save}
-              >
-                {saving ? "Menyimpan…" : "Simpan"}
-              </button>
-              <label className="flex cursor-pointer items-center gap-2 text-sm text-gray-700">
-                <input
-                  type="checkbox"
-                  className="h-4 w-4 rounded border-gray-300 text-blue-600"
-                  checked={published}
-                  onChange={(e) => setPublished(e.target.checked)}
-                />
-                Tampilkan di website
-              </label>
-            </div>
+      <SideSection title="Gambar event">
+        {image ? (
+          <div className="space-y-2">
+            <img src={image} alt="Gambar event" className="aspect-video w-full rounded-md object-cover" />
+            <button type="button" className="ck-btn-danger w-full" onClick={() => setImage("")}>
+              Hapus gambar
+            </button>
           </div>
+        ) : (
+          <button
+            type="button"
+            className="ck-btn-secondary w-full"
+            disabled={uploading}
+            onClick={() => fileRef.current?.click()}
+          >
+            {uploading ? "Mengunggah…" : "Unggah gambar"}
+          </button>
+        )}
+        <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={pickImage} />
+        <input
+          className="ck-input mt-2 font-mono text-xs"
+          value={image}
+          onChange={(e) => setImage(e.target.value)}
+          placeholder="/media/… atau https://…"
+          aria-label="URL gambar event"
+        />
+      </SideSection>
+    </>
+  );
 
-          <div className="ck-card space-y-3">
-            <Field label="Waktu Mulai">
-              <input
-                type="datetime-local"
-                className="ck-input"
-                value={startAt}
-                onChange={(e) => setStartAt(e.target.value)}
-              />
-            </Field>
-            <Field label="Waktu Selesai (opsional)" hint="Kosongkan bila acara seharian." />
-            <input
-              type="datetime-local"
-              className="ck-input"
-              value={endAt}
-              onChange={(e) => setEndAt(e.target.value)}
-            />
-            <Field label="Lokasi">
-              <input
-                className="ck-input"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                placeholder="Kantor Pusat CKS — Malang"
-              />
-            </Field>
-          </div>
+  return (
+    <EditorShell
+      backHref="/admin/events"
+      heading={isNew ? "Event baru" : "Edit event"}
+      subheading={event ? `Dibuat ${new Date(event.createdAt).toLocaleString("id-ID")}` : "Belum disimpan"}
+      actions={actions}
+      panelOpen={panelOpen}
+      onTogglePanel={() => setPanelOpen((v) => !v)}
+      side={side}
+    >
+      <input
+        className="ck-title-input"
+        placeholder="Tambahkan judul event"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        aria-label="Judul event"
+      />
+      <p className="ck-permalink">
+        Permalink: <span className="font-mono">/event/{effectiveSlug || "…"}</span>
+      </p>
 
-          <div className="ck-card">
-            <h3 className="mb-3 text-sm font-semibold text-gray-800">Gambar Event</h3>
-            {image ? (
-              <div className="space-y-2">
-                <img src={image} alt="Gambar event" className="aspect-video w-full rounded-md object-cover" />
-                <button
-                  type="button"
-                  className="ck-btn-danger w-full"
-                  onClick={() => setImage("")}
-                >
-                  Hapus gambar
-                </button>
-              </div>
-            ) : (
-              <button
-                type="button"
-                className="ck-btn-secondary w-full"
-                disabled={uploading}
-                onClick={() => fileRef.current?.click()}
-              >
-                {uploading ? "Mengunggah…" : "Unggah gambar"}
-              </button>
-            )}
-            <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={pickImage} />
-            <p className="mt-2 text-xs text-gray-400">Atau tempel URL gambar:</p>
-            <input
-              className="ck-input mt-1 font-mono text-xs"
-              value={image}
-              onChange={(e) => setImage(e.target.value)}
-              placeholder="/media/… atau https://…"
-            />
-          </div>
-        </div>
+      <div className="ck-card">
+        <Field label="Deskripsi singkat" hint="Tampil di daftar event & meta.">
+          <textarea
+            className="ck-input"
+            rows={3}
+            value={shortDescription}
+            onChange={(e) => setShortDescription(e.target.value)}
+            placeholder="Ringkasan singkat event…"
+          />
+        </Field>
       </div>
-    </div>
+
+      <div className="mt-4">
+        <p className="ck-label">Deskripsi lengkap</p>
+        <NovelEditor initialContent={event?.longDescriptionJson || null} onUpdate={onEditorUpdate} />
+      </div>
+    </EditorShell>
   );
 }

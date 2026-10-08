@@ -3,6 +3,64 @@
 @import "tippy.js/dist/tippy.css";
 @plugin "@tailwindcss/typography";
 
+/* Selaraskan aksen NextAdmin (default indigo) ke biru, agar seragam dengan halaman kustom. */
+:root {
+  --color-nextadmin-primary-50: var(--color-blue-50);
+  --color-nextadmin-primary-100: var(--color-blue-100);
+  --color-nextadmin-primary-200: var(--color-blue-200);
+  --color-nextadmin-primary-300: var(--color-blue-300);
+  --color-nextadmin-primary-400: var(--color-blue-400);
+  --color-nextadmin-primary-500: var(--color-blue-500);
+  --color-nextadmin-primary-600: var(--color-blue-600);
+  --color-nextadmin-primary-700: var(--color-blue-700);
+  --color-nextadmin-primary-800: var(--color-blue-800);
+  --color-nextadmin-primary-900: var(--color-blue-900);
+  --color-nextadmin-primary-950: var(--color-blue-950);
+  --color-nextadmin-brand-subtle: var(--color-blue-500);
+  --color-nextadmin-brand-default: var(--color-blue-600);
+  --color-nextadmin-brand-emphasis: var(--color-blue-700);
+
+  /* Sidebar gelap ala WordPress */
+  --color-nextadmin-menu-background: #1d2327;
+  --color-nextadmin-menu-color: #c3c4c7;
+  --color-nextadmin-menu-muted: #2c3338;
+  --color-nextadmin-menu-emphasis: #ffffff;
+}
+
+/* Pastikan teks sidebar terang di atas latar gelap */
+.next-admin__root [class~="bg-nextadmin-menu-background"] {
+  color: var(--color-nextadmin-menu-color);
+}
+.next-admin__root [class~="bg-nextadmin-menu-background"] a:hover,
+.next-admin__root [class~="bg-nextadmin-menu-background"] button:hover {
+  color: #ffffff;
+}
+
+/* Item menu aktif — biru ala WordPress */
+.next-admin__root a[class~="bg-nextadmin-menu-muted"],
+.next-admin__root a.ck-nav-active {
+  background-color: #2271b1;
+  color: #ffffff;
+}
+
+/* Label grup lebih redup & rapi */
+.next-admin__root [class~="bg-nextadmin-menu-background"] [class~="uppercase"] {
+  color: rgba(240, 246, 252, 0.45);
+  letter-spacing: 0.08em;
+  font-weight: 600;
+}
+
+/* Logo brand di atas sidebar */
+.next-admin__root [class~="bg-nextadmin-menu-background"] a[href="/admin"]::before {
+  content: "";
+  display: block;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  background: #ffffff url("/logo-cks.png") center / contain no-repeat;
+}
+
 @source "../../node_modules/@premieroctet/next-admin/dist";
 @source "../../node_modules/novel/dist";
 /* Pastikan utility layout Next Admin tidak ter-purge (sidebar fixed + konten digeser). */
@@ -52,8 +110,8 @@
 
 /* ——— Editor artikel (Novel) ——— */
 .ck-editor-wrap .ProseMirror {
-  min-height: 420px;
-  padding: 1rem 1.25rem;
+  min-height: 520px;
+  padding: 1.5rem 1.75rem 4rem;
   outline: none;
 }
 .ck-editor-wrap .ProseMirror p.is-editor-empty:first-child::before,
@@ -95,37 +153,240 @@
   flex: 1;
 }
 
-/* Utilitas form admin kustom */
+/* ——— Shell editor + toolbar (gaya Gutenberg) ——— */
+.ck-editor-shell {
+  @apply relative rounded-lg border border-gray-200 bg-white;
+}
+.ck-toolbar {
+  @apply sticky top-0 z-20 flex flex-wrap items-center gap-0.5 rounded-t-lg border-b border-gray-200 bg-gray-50/95 px-1.5 py-1.5 backdrop-blur;
+}
+.ck-tb-btn {
+  @apply inline-flex h-8 min-w-8 items-center justify-center rounded-md px-1.5 text-gray-600 transition hover:bg-gray-200/70 hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent;
+}
+.ck-tb-btn svg {
+  @apply h-4 w-4;
+}
+.ck-tb-btn.is-active {
+  @apply bg-blue-100 text-blue-700;
+}
+.ck-tb-sep {
+  @apply mx-1 h-5 w-px shrink-0 bg-gray-200;
+}
+.ck-tb-select {
+  @apply h-8 rounded-md border-0 bg-white px-2 text-sm font-medium text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-600;
+}
+.ck-tb-group {
+  @apply relative;
+}
+.ck-tb-menu {
+  @apply absolute left-0 top-10 z-30 w-44 overflow-hidden rounded-lg border border-gray-200 bg-white py-1 shadow-xl;
+}
+.ck-tb-menu-item {
+  @apply block w-full px-3 py-1.5 text-left text-sm text-gray-700 transition hover:bg-blue-50 hover:text-blue-700;
+}
+.ck-tb-menu-colors {
+  @apply w-56 p-2;
+}
+.ck-tb-menu-label {
+  @apply mb-1 mt-1 px-1 text-[11px] font-semibold uppercase tracking-wide text-gray-400;
+}
+.ck-tb-swatches {
+  @apply grid grid-cols-9 gap-1;
+}
+.ck-tb-swatch {
+  @apply flex h-6 w-6 items-center justify-center rounded border border-gray-200 text-xs font-bold transition hover:border-blue-400;
+}
+.ck-tb-swatch-empty {
+  @apply bg-white text-gray-400;
+}
+.ck-tb-count {
+  @apply ml-auto hidden select-none pl-2 text-xs text-gray-400 sm:inline;
+}
+
+/* Code block (lowlight) + rumus di dalam editor */
+.ck-editor-wrap .ProseMirror pre {
+  @apply my-4 overflow-x-auto rounded-lg bg-slate-900 p-4 text-sm leading-relaxed text-slate-100;
+}
+.ck-editor-wrap .ProseMirror pre code {
+  @apply bg-transparent p-0 text-inherit;
+}
+.ck-editor-wrap .ProseMirror .hljs-comment,
+.ck-editor-wrap .ProseMirror .hljs-quote {
+  color: #94a3b8;
+}
+.ck-editor-wrap .ProseMirror .hljs-keyword,
+.ck-editor-wrap .ProseMirror .hljs-selector-tag,
+.ck-editor-wrap .ProseMirror .hljs-built_in {
+  color: #c4b5fd;
+}
+.ck-editor-wrap .ProseMirror .hljs-string,
+.ck-editor-wrap .ProseMirror .hljs-attr,
+.ck-editor-wrap .ProseMirror .hljs-template-variable {
+  color: #86efac;
+}
+.ck-editor-wrap .ProseMirror .hljs-number,
+.ck-editor-wrap .ProseMirror .hljs-literal {
+  color: #fca5a5;
+}
+.ck-editor-wrap .ProseMirror .hljs-title,
+.ck-editor-wrap .ProseMirror .hljs-function,
+.ck-editor-wrap .ProseMirror .hljs-name {
+  color: #93c5fd;
+}
+.ck-editor-wrap .ProseMirror [data-type="math"],
+.ck-editor-wrap .ProseMirror .math-node {
+  @apply rounded bg-blue-50 px-1 text-blue-700;
+}
+
+/* ——— Halaman editor layar penuh ala WordPress ——— */
+.ck-editor-page {
+  @apply flex min-h-[100dvh] flex-col bg-gray-50;
+}
+.ck-editor-bar {
+  @apply sticky top-0 z-30 flex flex-wrap items-center justify-between gap-3 border-b border-gray-200 bg-white px-4 py-2.5;
+}
+.ck-editor-bar-left {
+  @apply flex min-w-0 items-center gap-2;
+}
+.ck-editor-bar-right {
+  @apply flex flex-wrap items-center gap-2;
+}
+.ck-editor-body {
+  @apply flex flex-1 flex-col xl:flex-row xl:items-start;
+}
+.ck-editor-canvas {
+  @apply min-w-0 flex-1;
+}
+.ck-canvas-inner {
+  @apply mx-auto w-full max-w-[880px] px-4 py-8;
+}
+.ck-editor-side {
+  @apply w-full shrink-0 border-t border-gray-200 bg-white xl:sticky xl:top-14 xl:max-h-[calc(100dvh-3.5rem)] xl:w-[300px] xl:overflow-y-auto xl:border-l xl:border-t-0;
+}
+.ck-side-head {
+  @apply flex items-center justify-between border-b border-gray-200 px-4 py-3;
+}
+.ck-side-body {
+  @apply space-y-3 p-3;
+}
+.ck-side-section {
+  @apply overflow-hidden rounded-xl border border-gray-200 bg-white;
+}
+.ck-side-section-head {
+  @apply flex cursor-pointer list-none items-center justify-between gap-2 px-3 py-2.5 text-sm font-semibold text-gray-800;
+}
+.ck-side-section-head::-webkit-details-marker {
+  display: none;
+}
+.ck-side-chevron {
+  @apply h-4 w-4 shrink-0 text-gray-400 transition-transform;
+}
+.ck-side-section[open] .ck-side-chevron {
+  transform: rotate(180deg);
+}
+.ck-side-section-body {
+  @apply space-y-3 border-t border-gray-100 px-3 py-3;
+}
+.ck-title-input {
+  @apply block w-full border-0 bg-transparent px-1 py-1 text-3xl font-bold tracking-tight text-gray-900 placeholder:text-gray-300 focus:outline-none sm:text-4xl;
+}
+.ck-permalink {
+  @apply mb-6 px-1 text-xs text-gray-400;
+}
+
+/* ——— Utilitas form admin kustom ——— */
 .ck-label {
-  @apply block text-sm font-medium text-gray-700 mb-1;
+  @apply mb-1.5 block text-sm font-medium text-gray-700;
 }
 .ck-input {
-  @apply block w-full rounded-md border-0 px-3 py-2 text-sm text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 disabled:opacity-60;
+  @apply block w-full rounded-lg border-0 px-3 py-2 text-sm text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 transition placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:opacity-60;
 }
 .ck-card {
-  @apply rounded-xl border border-gray-200 bg-white p-5 shadow-sm;
+  @apply rounded-2xl border border-gray-200 bg-white p-5 shadow-sm;
 }
 .ck-btn,
 .ck-btn-primary,
 .ck-btn-secondary,
 .ck-btn-success,
 .ck-btn-danger {
-  @apply inline-flex items-center justify-center gap-1.5 rounded-md px-3.5 py-2 text-sm font-semibold shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  @apply inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-lg px-3.5 py-2 text-sm font-semibold shadow-sm transition-all duration-150 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100;
 }
 .ck-btn-primary {
-  @apply bg-blue-600 text-white hover:bg-blue-700;
+  @apply bg-blue-600 text-white hover:bg-blue-700 focus-visible:ring-blue-500;
 }
 .ck-btn-secondary {
-  @apply bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50;
+  @apply bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 hover:text-gray-900 focus-visible:ring-gray-400;
 }
 .ck-btn-success {
-  @apply bg-emerald-600 text-white hover:bg-emerald-700;
+  @apply bg-emerald-600 text-white hover:bg-emerald-700 focus-visible:ring-emerald-500;
 }
 .ck-btn-danger {
-  @apply bg-white text-red-600 ring-1 ring-inset ring-red-200 hover:bg-red-50;
+  @apply bg-white text-red-600 ring-1 ring-inset ring-red-200 hover:bg-red-50 focus-visible:ring-red-400;
 }
 .ck-badge {
-  @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+  @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium;
+}
+
+/* ——— Header halaman admin ——— */
+.ck-page-head {
+  @apply mb-5 flex flex-wrap items-start justify-between gap-3;
+}
+.ck-page-title {
+  @apply text-xl font-bold tracking-tight text-gray-900 sm:text-2xl;
+}
+.ck-page-desc {
+  @apply mt-1 max-w-2xl text-sm text-gray-500;
+}
+.ck-page-actions {
+  @apply flex flex-wrap items-center gap-2;
+}
+
+/* ——— Tab tersegmentasi ——— */
+.ck-tabs {
+  @apply inline-flex flex-wrap items-center gap-1 rounded-xl bg-gray-100 p-1;
+}
+.ck-tab {
+  @apply inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-gray-600 transition hover:text-gray-900;
+}
+.ck-tab.is-active {
+  @apply bg-white text-blue-700 shadow-sm;
+}
+.ck-tab-count {
+  @apply text-xs text-gray-400;
+}
+.ck-tab.is-active .ck-tab-count {
+  @apply text-blue-500;
+}
+
+/* ——— Empty state ——— */
+.ck-empty {
+  @apply flex flex-col items-center justify-center gap-1.5 px-4 py-14 text-center;
+}
+.ck-empty-icon {
+  @apply mb-1 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-400;
+}
+.ck-empty-icon svg {
+  @apply h-6 w-6;
+}
+.ck-empty-title {
+  @apply text-sm font-semibold text-gray-700;
+}
+.ck-empty-desc {
+  @apply text-sm text-gray-400;
+}
+
+/* ——— Tabel admin ——— */
+.ck-table {
+  @apply min-w-full divide-y divide-gray-200 text-sm;
+}
+.ck-table thead th {
+  @apply bg-gray-50 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500;
+}
+.ck-table tbody tr {
+  @apply transition-colors hover:bg-blue-50/40;
+}
+.ck-table tbody td {
+  @apply px-4 py-3 align-middle;
 }
 
 /* Tippy / bubble Novel — transparan tapi di atas sidebar (z-50) */

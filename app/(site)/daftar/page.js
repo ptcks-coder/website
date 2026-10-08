@@ -1,9 +1,13 @@
 import DaftarForm from "@/components/DaftarForm";
 import Link from "next/link";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata = {
-  title: "Pendaftaran online CPMI"
-};
+export const metadata = pageMetadata({
+  title: "Pendaftaran online CPMI",
+  description:
+    "Formulir pendaftaran online CPMI di CKS. Isi data pribadi dan minat penempatan, petugas akan menindaklanjuti.",
+  path: "/daftar"
+});
 
 export default function DaftarPage() {
   return (

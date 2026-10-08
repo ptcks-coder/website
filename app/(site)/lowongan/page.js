@@ -2,12 +2,17 @@ import Link from "next/link";
 import { COMPANY } from "@/data/site";
 import { getLowonganImage, DEMO_IMAGES } from "@/lib/demo-images";
 import { getActiveJobs } from "@/lib/queries";
+import { pageMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  title: "Lowongan"
-};
+export const metadata = pageMetadata({
+  title: "Lowongan",
+  description:
+    "Informasi lowongan kerja luar negeri untuk CPMI: Taiwan, Hong Kong, Malaysia, dan Singapura. Detail dikonfirmasi saat pendaftaran.",
+  path: "/lowongan",
+  image: DEMO_IMAGES.hero
+});
 
 export default async function LowonganPage() {
   const jobs = await getActiveJobs();

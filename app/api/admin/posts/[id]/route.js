@@ -95,11 +95,12 @@ export async function PUT(request, { params }) {
       excerpt: String(body.excerpt || "").slice(0, 500) || null,
       contentJson,
       contentHtml,
-      featuredImage: body.featuredImage ?? existing.featuredImage,
+      featuredImage: "featuredImage" in body ? body.featuredImage || null : existing.featuredImage,
       status: finalStatus,
-      seoTitle: body.seoTitle ?? existing.seoTitle,
-      seoDescription: body.seoDescription ?? existing.seoDescription,
-      focusKeyword: body.focusKeyword ?? existing.focusKeyword,
+      seoTitle: "seoTitle" in body ? body.seoTitle || null : existing.seoTitle,
+      seoDescription:
+        "seoDescription" in body ? body.seoDescription || null : existing.seoDescription,
+      focusKeyword: "focusKeyword" in body ? body.focusKeyword || null : existing.focusKeyword,
       publishedAt,
       categories: { set: (body.categoryIds || []).map((cid) => ({ id: Number(cid) })) },
       tags: { set: (body.tagIds || []).map((tid) => ({ id: Number(tid) })) }

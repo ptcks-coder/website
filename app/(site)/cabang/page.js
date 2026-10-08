@@ -2,12 +2,17 @@ import Link from "next/link";
 import { COMPANY } from "@/data/site";
 import { DEMO_IMAGES } from "@/lib/demo-images";
 import { getBranches } from "@/lib/queries";
+import { pageMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  title: "Cabang"
-};
+export const metadata = pageMetadata({
+  title: "Cabang",
+  description:
+    "Daftar kantor cabang CKS di Indonesia beserta kode, alamat, dan kontak yang dapat dihubungi.",
+  path: "/cabang",
+  image: DEMO_IMAGES.profil
+});
 
 export default async function CabangPage() {
   const branches = await getBranches();

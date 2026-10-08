@@ -1,12 +1,16 @@
 import Link from "next/link";
 import { getPublishedPosts } from "@/lib/queries";
 import { getBlogImage } from "@/lib/demo-images";
+import { pageMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  title: "Blog"
-};
+export const metadata = pageMetadata({
+  title: "Blog",
+  description:
+    "Artikel dan panduan seputar penempatan CPMI: dokumen, BLK, dan tahapan proses di CKS.",
+  path: "/blog"
+});
 
 export function formatDate(iso) {
   try {

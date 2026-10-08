@@ -1,10 +1,15 @@
 import Link from "next/link";
 import { COMPANY } from "@/data/site";
 import { DEMO_IMAGES } from "@/lib/demo-images";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata = {
-  title: "Profil perusahaan"
-};
+export const metadata = pageMetadata({
+  title: "Profil perusahaan",
+  description:
+    "Profil PT Citra Karya Sejati (CKS) — perusahaan penempatan CPMI: layanan, proses, dan negara tujuan penempatan.",
+  path: "/profil",
+  image: DEMO_IMAGES.profil
+});
 
 export default function ProfilPage() {
   return (

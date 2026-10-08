@@ -2,10 +2,15 @@ import Link from "next/link";
 import AlurProses from "@/components/AlurProses";
 import { COMPANY } from "@/data/site";
 import { DEMO_IMAGES } from "@/lib/demo-images";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata = {
-  title: "Layanan"
-};
+export const metadata = pageMetadata({
+  title: "Layanan",
+  description:
+    "Layanan CKS: pendampingan penempatan CPMI, pelatihan BLK, dan administrasi dokumen hingga keberangkatan.",
+  path: "/layanan",
+  image: DEMO_IMAGES.profil
+});
 
 export default function LayananPage() {
   return (

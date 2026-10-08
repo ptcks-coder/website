@@ -2,12 +2,17 @@ import { COMPANY } from "@/data/site";
 import { DEMO_IMAGES } from "@/lib/demo-images";
 import { getSettings } from "@/lib/settings";
 import KontakForm from "@/components/KontakForm";
+import { pageMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  title: "Kontak"
-};
+export const metadata = pageMetadata({
+  title: "Kontak",
+  description:
+    "Hubungi CKS: alamat kantor, telepon, WhatsApp, email, jam kerja, dan formulir pesan untuk pertanyaan seputar CPMI.",
+  path: "/kontak",
+  image: DEMO_IMAGES.hero
+});
 
 function waLink(wa) {
   const num = String(wa || "").replace(/[^0-9]/g, "");

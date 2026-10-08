@@ -2,12 +2,17 @@ import { COMPANY } from "@/data/site";
 import { DEMO_IMAGES } from "@/lib/demo-images";
 import { getGalleryItems } from "@/lib/queries";
 import GaleriGrid from "@/components/GaleriGrid";
+import { pageMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  title: "Galeri"
-};
+export const metadata = pageMetadata({
+  title: "Galeri",
+  description:
+    "Galeri foto dan video kegiatan CKS: sosialisasi, pelatihan BLK, dan dokumentasi operasional penempatan CPMI.",
+  path: "/galeri",
+  image: DEMO_IMAGES.blog["apa-itu-blk"]
+});
 
 export default async function GaleriPage() {
   const items = await getGalleryItems();

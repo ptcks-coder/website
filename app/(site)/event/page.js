@@ -2,12 +2,17 @@ import Link from "next/link";
 import { COMPANY } from "@/data/site";
 import { DEMO_IMAGES } from "@/lib/demo-images";
 import { getEvents } from "@/lib/queries";
+import { pageMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  title: "Event & Kegiatan"
-};
+export const metadata = pageMetadata({
+  title: "Event & Kegiatan",
+  description:
+    "Jadwal event dan kegiatan CKS: sosialisasi, pembukaan kelas BLK, dan kegiatan lain untuk calon pekerja migran.",
+  path: "/event",
+  image: DEMO_IMAGES.profil
+});
 
 function fmtDate(iso) {
   return new Intl.DateTimeFormat("id-ID", {

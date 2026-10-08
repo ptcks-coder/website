@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getEventBySlug } from "@/lib/queries";
 import { DEMO_IMAGES } from "@/lib/demo-images";
+import { pageMetadata, eventJsonLd, breadcrumbJsonLd, jsonLdScript } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
@@ -9,7 +10,13 @@ export async function generateMetadata({ params }) {
   const { slug } = await params;
   const event = await getEventBySlug(slug).catch(() => null);
   if (!event) return { title: "Event" };
-  return { title: event.title, description: event.shortDescription || undefined };
+  return pageMetadata({
+    title: event.title,
+    description: event.shortDescription || undefined,
+    path: `/event/${event.slug}`,
+    image: event.image || DEMO_IMAGES.profil,
+    type: "article"
+  });
 }
 
 function fmtDate(iso) {
@@ -36,6 +43,20 @@ export default async function EventDetailPage({ params }) {
 
   return (
     <article className="article-page">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={jsonLdScript(eventJsonLd(event))}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={jsonLdScript(
+          breadcrumbJsonLd([
+            { name: "Beranda", path: "/" },
+            { name: "Event", path: "/event" },
+            { name: event.title, path: `/event/${event.slug}` }
+          ])
+        )}
+      />
       <div className="container article-layout">
         <Link href="/event" className="article-back">
           ← Kembali ke event

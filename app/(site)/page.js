@@ -6,6 +6,10 @@ import { getPublishedPosts, getActiveJobs, getEvents, getHeroSlides } from "@/li
 
 export const dynamic = "force-dynamic";
 
+export const metadata = {
+  alternates: { canonical: "/" }
+};
+
 function fmtDate(iso) {
   return new Intl.DateTimeFormat("id-ID", {
     day: "numeric",

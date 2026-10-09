@@ -63,8 +63,11 @@ export default function AdminLinkInterceptor() {
         '.next-admin__root [class~="bg-nextadmin-menu-background"]'
       );
       if (!sidebar) return false;
+      // Hanya item di dalam <nav> (bukan tautan brand di atas menu)
+      const nav = sidebar.querySelector("nav");
+      if (!nav) return false;
       const current = normalize(pathname);
-      sidebar.querySelectorAll('a[href^="/admin"]').forEach((a) => {
+      nav.querySelectorAll('a[href^="/admin"]').forEach((a) => {
         const href = normalize(a.getAttribute("href"));
         a.classList.toggle("ck-nav-active", mapPath(href) === current);
       });

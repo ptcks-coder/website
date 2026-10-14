@@ -156,13 +156,14 @@ export default function EventsTable({ role }) {
                       Edit
                     </Link>
                     {e.published ? (
-                      <Link
+                      <a
                         href={`/event/${e.slug}`}
                         target="_blank"
+                        rel="noopener noreferrer"
                         className="ck-btn-secondary px-2 py-1"
                       >
                         Lihat
-                      </Link>
+                      </a>
                     ) : null}
                     {isAdmin ? (
                       <button

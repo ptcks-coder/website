@@ -168,13 +168,14 @@ export default function PostsTable({ role }) {
                       Edit
                     </Link>
                     {p.status === "PUBLISHED" ? (
-                      <Link
+                      <a
                         href={`/blog/${p.slug}`}
                         target="_blank"
+                        rel="noopener noreferrer"
                         className="ck-btn-secondary px-2 py-1"
                       >
                         Lihat
-                      </Link>
+                      </a>
                     ) : null}
                     {isAdmin && p.status === "PENDING" ? (
                       <button
